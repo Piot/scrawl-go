@@ -126,6 +126,48 @@ func (LineDelimiterToken) String() string {
 	return "LineDelimiter"
 }
 
+// StartMetaDataToken :
+type StartMetaDataToken struct {
+	position Position
+}
+
+func (s StartMetaDataToken) Position() Position {
+	return s.position
+}
+func (StartMetaDataToken) String() string {
+	return "StartMetaDataToken"
+}
+
+// EndMetaDataToken :
+type EndMetaDataToken struct {
+	position Position
+}
+
+func (s EndMetaDataToken) Position() Position {
+	return s.position
+}
+func (EndMetaDataToken) String() string {
+	return "EndMetaDataToken"
+}
+
+// StringToken :
+type StringToken struct {
+	text     string
+	position Position
+}
+
+func (s StringToken) Position() Position {
+	return s.position
+}
+
+func (s StringToken) String() string {
+	return fmt.Sprintf("string:%s", s.text)
+}
+
+func (s StringToken) Text() string {
+	return s.text
+}
+
 func isIndentation(ch rune) bool {
 	return ch == ' '
 }
@@ -156,6 +198,18 @@ func isDigit(ch rune) bool {
 
 func isSymbol(ch rune) bool {
 	return isLetter(ch) || isDigit(ch) || ch == '-'
+}
+
+func isStartMetaData(ch rune) bool {
+	return ch == '['
+}
+
+func isEndMetaData(ch rune) bool {
+	return ch == ']'
+}
+
+func isStartString(ch rune) bool {
+	return ch == '\'' || ch == '"'
 }
 
 // NewTokenizer :
@@ -235,6 +289,22 @@ func (t *Tokenizer) parseNumber() (Token, error) {
 	return NumberToken{number: 0.0, position: startPosition}, nil
 }
 
+func (t *Tokenizer) parseString(startStringRune rune) (Token, error) {
+	var a string
+	startPosition := t.position
+	for true {
+		ch := t.nextRune()
+		if ch == startStringRune {
+			break
+		}
+		if ch == 0 {
+			return nil, fmt.Errorf("Unexpected end while finding end of string")
+		}
+		a += string(ch)
+	}
+	return StringToken{text: a, position: startPosition}, nil
+}
+
 func (t *Tokenizer) parseNewLine() (Token, error) {
 	indentation, indentationErr := t.parseIndentation()
 	if indentationErr != nil {
@@ -277,13 +347,21 @@ func (t *Tokenizer) internalReadNext() (Token, error) {
 		} else if isDigit(r) {
 			t.unreadRune()
 			return t.parseNumber()
+		} else if isStartString(r) {
+			return t.parseString(r)
+		} else if isStartMetaData(r) {
+			return StartMetaDataToken{position: t.position}, nil
+		} else if isEndMetaData(r) {
+			return EndMetaDataToken{position: t.position}, nil
 		} else if isWhitespaceExceptNewLine(r) {
+			return t.internalReadNext()
+		} else if r == ',' {
 			return t.internalReadNext()
 		} else if r == 0 {
 			return nil, nil
 		}
 	}
-	return nil, fmt.Errorf("Unknown rune %v", r)
+	return nil, fmt.Errorf("Unknown rune '%c' %v", r, r)
 }
 
 func (t *Tokenizer) ReadNext() (Token, error) {
@@ -291,6 +369,6 @@ func (t *Tokenizer) ReadNext() (Token, error) {
 	if err != nil {
 		return nil, TokenizerError{err: err, position: t.position}
 	}
-
+	// fmt.Printf("return: %v\n", token)
 	return token, nil
 }

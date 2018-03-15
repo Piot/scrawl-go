@@ -92,7 +92,7 @@ type SomeType
   type   Another
 
 component AnotherComponent
-  usingTheType int
+  usingTheType int [range "34-45", debug "hello world"]
   Name string
 
 entity ThisISTheEntity2
@@ -126,6 +126,14 @@ entity ThisISTheEntity2
 	if fields[0].FieldType() != "int" {
 		t.Errorf("Wrong field name:%v", fields[0].FieldType())
 	}
+	metaDataValues := fields[0].MetaData().Values
+	if metaDataValues["range"] != "34-45" {
+		t.Errorf("Wrong meta data name:%v", metaDataValues["range"])
+	}
+	if metaDataValues["debug"] != "hello world" {
+		t.Errorf("Wrong meta data name:%v", metaDataValues["debug"])
+	}
+
 	if fields[1].Name() != "Name" {
 		t.Errorf("Wrong field name:%v", fields[1].Name())
 	}

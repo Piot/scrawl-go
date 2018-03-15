@@ -44,6 +44,12 @@ func TestSimpleSymbol(t *testing.T) {
 	expectEnd(t, tokenizer)
 }
 
+func TestSimpleString(t *testing.T) {
+	tokenizer := setup("          'this is a test' ")
+	expectString(t, tokenizer, "this is a test")
+	expectEnd(t, tokenizer)
+}
+
 func expectSymbol(t *testing.T, tokenizer *Tokenizer, expectedString string) {
 	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.ReadNext()
 	if hopefullySymbolTokenErr != nil {
@@ -52,6 +58,17 @@ func expectSymbol(t *testing.T, tokenizer *Tokenizer, expectedString string) {
 	_, ok := hopefullySymbolToken.(SymbolToken)
 	if !ok {
 		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
+	}
+}
+
+func expectString(t *testing.T, tokenizer *Tokenizer, expectedString string) {
+	hopefullyStringToken, hopefullyStringTokenErr := tokenizer.ReadNext()
+	if hopefullyStringTokenErr != nil {
+		t.Error(hopefullyStringTokenErr)
+	}
+	_, ok := hopefullyStringToken.(StringToken)
+	if !ok {
+		t.Errorf("Wrong type. Expected String but was %v", hopefullyStringToken)
 	}
 }
 

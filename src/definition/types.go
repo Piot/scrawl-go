@@ -26,6 +26,8 @@ SOFTWARE.
 
 package definition
 
+import "fmt"
+
 type Type struct {
 	name string
 }
@@ -33,10 +35,11 @@ type Type struct {
 type Field struct {
 	name      string
 	fieldType string
+	metaData  MetaData
 }
 
-func NewField(name string, fieldType string) *Field {
-	return &Field{name: name, fieldType: fieldType}
+func NewField(name string, fieldType string, metaData MetaData) *Field {
+	return &Field{name: name, fieldType: fieldType, metaData: metaData}
 }
 
 func (c *Field) Name() string {
@@ -45,6 +48,17 @@ func (c *Field) Name() string {
 
 func (c *Field) FieldType() string {
 	return c.fieldType
+}
+
+func (c *Field) MetaData() MetaData {
+	return c.metaData
+}
+
+func (c *Field) String() string {
+	var s string
+	s += fmt.Sprintf("[field '%v' %v]", c.name, c.fieldType)
+
+	return s
 }
 
 type Component struct {
@@ -62,6 +76,16 @@ func (c *Component) Name() string {
 
 func (c *Component) Fields() []*Field {
 	return c.fields
+}
+
+func (c *Component) String() string {
+	var s string
+	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
+	for _, field := range c.fields {
+		s += "  " + field.String() + "\n"
+	}
+
+	return s
 }
 
 type Entity struct {
@@ -82,10 +106,28 @@ func NewUserType(name string, fields []*Field) *UserType {
 	return &UserType{name: name, fields: fields}
 }
 
+type MetaData struct {
+	Values map[string]string
+}
+
 type Root struct {
 	components []*Component
 	userTypes  []*UserType
 	entities   []*Entity
+}
+
+func (r *Root) String() string {
+	var s string
+
+	s += fmt.Sprintf("Components: %d\n", len(r.components))
+	s += fmt.Sprintf("Entities: %d\n", len(r.entities))
+	s += fmt.Sprintf("UserTypes: %d\n", len(r.userTypes))
+
+	for _, component := range r.components {
+		s += component.String() + "\n"
+	}
+
+	return s
 }
 
 func (r *Root) Components() []*Component {

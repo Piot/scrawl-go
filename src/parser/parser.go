@@ -78,6 +78,46 @@ func (p *Parser) parseSymbol() (string, error) {
 	return symbolToken.Symbol, nil
 }
 
+func (p *Parser) parseString() (string, error) {
+	token, tokenErr := p.readNext()
+	if tokenErr != nil {
+		return "", tokenErr
+	}
+	stringToken, wasString := token.(tokenize.StringToken)
+	if !wasString {
+		return "", fmt.Errorf("Wasn't a string")
+	}
+
+	return stringToken.Text(), nil
+}
+
+func (p *Parser) parseMetaData() (definition.MetaData, error) {
+	metaData := definition.MetaData{Values: make(map[string]string)}
+	for true {
+		token, tokenErr := p.readNext()
+		if tokenErr != nil {
+			return definition.MetaData{}, tokenErr
+		}
+		symbolToken, wasSymbol := token.(tokenize.SymbolToken)
+		if wasSymbol {
+			metaName := symbolToken.Symbol
+			metaValue, metaValueErr := p.parseString()
+			if metaValueErr != nil {
+				return definition.MetaData{}, fmt.Errorf("Expected a meta value (%v)", metaValueErr)
+			}
+			metaData.Values[metaName] = metaValue
+		} else {
+			_, wasEndOfMetaData := token.(tokenize.EndMetaDataToken)
+			if !wasEndOfMetaData {
+				return definition.MetaData{}, fmt.Errorf("Expected a meta value or end of meta (%v)", token)
+			}
+			break
+		}
+	}
+
+	return metaData, nil
+}
+
 func (p *Parser) parseField(name string) (*definition.Field, error) {
 	fieldType, fieldTypeErr := p.parseSymbol()
 	if fieldTypeErr != nil {
@@ -88,12 +128,26 @@ func (p *Parser) parseField(name string) (*definition.Field, error) {
 	if hopefullyLineDelimiterErr != nil {
 		return nil, hopefullyLineDelimiterErr
 	}
+
+	_, isStartMeta := hopefullyLineDelimiter.(tokenize.StartMetaDataToken)
+	var metaData definition.MetaData
+	if isStartMeta {
+		var metaDataErr error
+		metaData, metaDataErr = p.parseMetaData()
+		if metaDataErr != nil {
+			return nil, metaDataErr
+		}
+		hopefullyLineDelimiter, hopefullyLineDelimiterErr = p.readNext()
+		if hopefullyLineDelimiterErr != nil {
+			return nil, hopefullyLineDelimiterErr
+		}
+	}
 	_, wasEndOfLine := hopefullyLineDelimiter.(tokenize.LineDelimiterToken)
 	if !wasEndOfLine {
 		return nil, fmt.Errorf("Must end lines after field type")
 	}
 
-	field := definition.NewField(name, fieldType)
+	field := definition.NewField(name, fieldType, metaData)
 	return field, nil
 }
 
