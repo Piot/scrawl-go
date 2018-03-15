@@ -97,6 +97,14 @@ func NewEntity(name string, fields []*Field) *Entity {
 	return &Entity{name: name, fields: fields}
 }
 
+func (c *Entity) Name() string {
+	return c.name
+}
+
+func (c *Entity) Field(index int) *Field {
+	return c.fields[index]
+}
+
 type UserType struct {
 	name   string
 	fields []*Field
@@ -114,6 +122,24 @@ type Root struct {
 	components []*Component
 	userTypes  []*UserType
 	entities   []*Entity
+}
+
+func (r *Root) FindComponent(name string) *Component {
+	for _, component := range r.components {
+		if component.Name() == name {
+			return component
+		}
+	}
+	return nil
+}
+
+func (r *Root) FindEntity(name string) *Entity {
+	for _, entity := range r.entities {
+		if entity.Name() == name {
+			return entity
+		}
+	}
+	return nil
 }
 
 func (r *Root) String() string {
