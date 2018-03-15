@@ -45,30 +45,30 @@ func TestSimpleSymbol(t *testing.T) {
 }
 
 func expectSymbol(t *testing.T, tokenizer *Tokenizer, expectedString string) {
-	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.readNext()
+	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.ReadNext()
 	if hopefullySymbolTokenErr != nil {
 		t.Error(hopefullySymbolTokenErr)
 	}
 	_, ok := hopefullySymbolToken.(SymbolToken)
 	if !ok {
-		t.Errorf("Casting didn't work %v", hopefullySymbolToken)
+		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
 	}
 }
 
 func expectStartScope(t *testing.T, tokenizer *Tokenizer) {
-	maybeStartScope, maybeStartScopeErr := tokenizer.readNext()
+	maybeStartScope, maybeStartScopeErr := tokenizer.ReadNext()
 	if maybeStartScopeErr != nil {
 		t.Error(maybeStartScopeErr)
 	}
 
 	_, ok := maybeStartScope.(StartScopeToken)
 	if !ok {
-		t.Errorf("Couldn't cast to start scope %v", maybeStartScope)
+		t.Errorf("Couldn't cast to start scope token")
 	}
 }
 
 func expectEndScope(t *testing.T, tokenizer *Tokenizer) {
-	maybeEndScope, maybeEndScopeErr := tokenizer.readNext()
+	maybeEndScope, maybeEndScopeErr := tokenizer.ReadNext()
 	if maybeEndScopeErr != nil {
 		t.Error(maybeEndScopeErr)
 	}
@@ -79,8 +79,20 @@ func expectEndScope(t *testing.T, tokenizer *Tokenizer) {
 	}
 }
 
+func expectLineDelimiter(t *testing.T, tokenizer *Tokenizer) {
+	maybeStartScope, maybeStartScopeErr := tokenizer.ReadNext()
+	if maybeStartScopeErr != nil {
+		t.Error(maybeStartScopeErr)
+	}
+
+	_, ok := maybeStartScope.(LineDelimiterToken)
+	if !ok {
+		t.Errorf("Expected LineDelimiter but got %v", maybeStartScope)
+	}
+}
+
 func expectEnd(t *testing.T, tokenizer *Tokenizer) {
-	maybeEnd, maybeEndErr := tokenizer.readNext()
+	maybeEnd, maybeEndErr := tokenizer.ReadNext()
 	if maybeEndErr != nil {
 		t.Error(maybeEndErr)
 	}
@@ -108,8 +120,10 @@ namespace TheSpace
 	expectStartScope(t, tokenizer)
 	expectSymbol(t, tokenizer, "hello")
 	expectSymbol(t, tokenizer, "int32")
+	expectLineDelimiter(t, tokenizer)
 	expectSymbol(t, tokenizer, "type")
 	expectSymbol(t, tokenizer, "Another")
+	expectLineDelimiter(t, tokenizer)
 	expectEndScope(t, tokenizer)
 	expectEndScope(t, tokenizer)
 	expectEnd(t, tokenizer)
