@@ -26,7 +26,10 @@ SOFTWARE.
 
 package definition
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Type struct {
 	name string
@@ -82,27 +85,64 @@ func (c *Component) String() string {
 	var s string
 	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
 	for _, field := range c.fields {
-		s += "  " + field.String() + "\n"
+		s += "    " + field.String() + "\n"
 	}
 
 	return s
 }
 
-type Entity struct {
-	name   string
-	fields []*Field
+type ComponentField struct {
+	name      string
+	component *Component
 }
 
-func NewEntity(name string, fields []*Field) *Entity {
-	return &Entity{name: name, fields: fields}
+func (c *ComponentField) Name() string {
+	return c.name
+}
+
+func (c *ComponentField) Component() *Component {
+	return c.component
+}
+
+func NewComponentField(name string, component *Component) *ComponentField {
+	return &ComponentField{name: name, component: component}
+}
+
+func (c *ComponentField) String() string {
+	var s string
+	s += fmt.Sprintf("[componentfield '%v' %s   ]", c.name, c.Component())
+	return s
+}
+
+type Entity struct {
+	name            string
+	componentFields []*ComponentField
+}
+
+func NewEntity(name string, componentFields []*ComponentField) *Entity {
+	return &Entity{name: name, componentFields: componentFields}
+}
+
+func (c *Entity) String() string {
+	var s string
+	s += fmt.Sprintf("[entity '%v' components:%d\n", c.name, len(c.componentFields))
+	for _, field := range c.componentFields {
+		s += "  " + field.String() + "\n"
+	}
+	s += "]"
+	return s
 }
 
 func (c *Entity) Name() string {
 	return c.name
 }
 
-func (c *Entity) Field(index int) *Field {
-	return c.fields[index]
+func (c *Entity) Component(index int) *ComponentField {
+	return c.componentFields[index]
+}
+
+func (c *Entity) Components() []*ComponentField {
+	return c.componentFields
 }
 
 type UserType struct {
@@ -116,6 +156,11 @@ func NewUserType(name string, fields []*Field) *UserType {
 
 type MetaData struct {
 	Values map[string]string
+}
+
+func (m *MetaData) Int(name string) (int, error) {
+	s := m.Values[name]
+	return strconv.Atoi(s)
 }
 
 type Root struct {
@@ -149,8 +194,8 @@ func (r *Root) String() string {
 	s += fmt.Sprintf("Entities: %d\n", len(r.entities))
 	s += fmt.Sprintf("UserTypes: %d\n", len(r.userTypes))
 
-	for _, component := range r.components {
-		s += component.String() + "\n"
+	for _, entity := range r.entities {
+		s += entity.String() + "\n"
 	}
 
 	return s
@@ -158,6 +203,10 @@ func (r *Root) String() string {
 
 func (r *Root) Components() []*Component {
 	return r.components
+}
+
+func (r *Root) Entities() []*Entity {
+	return r.entities
 }
 
 func (r *Root) AddComponent(c *Component) {

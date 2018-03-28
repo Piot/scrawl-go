@@ -39,6 +39,10 @@ func ParseFile(filename string) (*definition.Root, error) {
 		return nil, octetsErr
 	}
 	text := string(octets)
+	return ParseString(text)
+}
+
+func ParseString(text string) (*definition.Root, error) {
 	parser, parserErr := parser.NewParser(text)
 	if parserErr != nil {
 		return nil, parserErr
