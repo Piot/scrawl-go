@@ -118,7 +118,7 @@ func (p *Parser) parseMetaData() (definition.MetaData, error) {
 	return metaData, nil
 }
 
-func (p *Parser) parseField(name string) (*definition.Field, error) {
+func (p *Parser) parseField(index int, name string) (*definition.Field, error) {
 	fieldType, fieldTypeErr := p.parseSymbol()
 	if fieldTypeErr != nil {
 		return &definition.Field{}, fmt.Errorf("Expected a field symbol (%v)", fieldTypeErr)
@@ -147,7 +147,7 @@ func (p *Parser) parseField(name string) (*definition.Field, error) {
 		return nil, fmt.Errorf("Must end lines after field type")
 	}
 
-	field := definition.NewField(name, fieldType, metaData)
+	field := definition.NewField(index, name, fieldType, metaData)
 	return field, nil
 }
 
@@ -168,7 +168,7 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 			return nil, fmt.Errorf("Expected fieldname or end of scope")
 		}
 
-		parsedField, parseFieldErr := p.parseField(symbolToken.Symbol)
+		parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
 		if parseFieldErr != nil {
 			return nil, parseFieldErr
 		}
@@ -242,7 +242,7 @@ func (p *Parser) parseEntity() (*definition.Entity, error) {
 	var componentFields []*definition.ComponentField
 	for _, fieldComponent := range fields {
 		componentType := p.root.FindComponent(fieldComponent.FieldType())
-		componentField := definition.NewComponentField(fieldComponent.Name(), componentType)
+		componentField := definition.NewComponentField(len(componentFields), fieldComponent.Name(), componentType)
 		componentFields = append(componentFields, componentField)
 	}
 	entity := definition.NewEntity(name, componentFields)

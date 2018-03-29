@@ -36,13 +36,17 @@ type Type struct {
 }
 
 type Field struct {
+	index     int
 	name      string
 	fieldType string
 	metaData  MetaData
 }
 
-func NewField(name string, fieldType string, metaData MetaData) *Field {
-	return &Field{name: name, fieldType: fieldType, metaData: metaData}
+func NewField(index int, name string, fieldType string, metaData MetaData) *Field {
+	return &Field{index: index, name: name, fieldType: fieldType, metaData: metaData}
+}
+func (c *Field) Index() int {
+	return c.index
 }
 
 func (c *Field) Name() string {
@@ -92,10 +96,14 @@ func (c *Component) String() string {
 }
 
 type ComponentField struct {
+	index     int
 	name      string
 	component *Component
 }
 
+func (c *ComponentField) Index() int {
+	return c.index
+}
 func (c *ComponentField) Name() string {
 	return c.name
 }
@@ -104,8 +112,8 @@ func (c *ComponentField) Component() *Component {
 	return c.component
 }
 
-func NewComponentField(name string, component *Component) *ComponentField {
-	return &ComponentField{name: name, component: component}
+func NewComponentField(index int, name string, component *Component) *ComponentField {
+	return &ComponentField{index: index, name: name, component: component}
 }
 
 func (c *ComponentField) String() string {
