@@ -28,22 +28,26 @@ package parser
 
 import (
 	"fmt"
+
+	"github.com/piot/scrawl-go/src/token"
+
 	"strings"
 
 	"github.com/piot/scrawl-go/src/definition"
+	"github.com/piot/scrawl-go/src/runestream"
 	"github.com/piot/scrawl-go/src/tokenize"
 )
 
 func setupTokenizer(text string) *tokenize.Tokenizer {
 	ioReader := strings.NewReader(text)
-	runeReader := tokenize.NewRuneReader(ioReader)
+	runeReader := runestream.NewRuneReader(ioReader)
 	tokenizer := tokenize.NewTokenizer(runeReader)
 	return tokenizer
 }
 
 type ParserError struct {
 	err      error
-	position tokenize.Position
+	position token.Position
 }
 
 func (f ParserError) Error() string {
@@ -53,10 +57,10 @@ func (f ParserError) Error() string {
 type Parser struct {
 	tokenizer *tokenize.Tokenizer
 	root      *definition.Root
-	lastToken tokenize.Token
+	lastToken token.Token
 }
 
-func (p *Parser) readNext() (tokenize.Token, error) {
+func (p *Parser) readNext() (token.Token, error) {
 	token, err := p.tokenizer.ReadNext()
 	if err != nil {
 		return nil, err
@@ -65,199 +69,15 @@ func (p *Parser) readNext() (tokenize.Token, error) {
 	return token, nil
 }
 
-func (p *Parser) parseSymbol() (string, error) {
-	token, tokenErr := p.readNext()
-	if tokenErr != nil {
-		return "", tokenErr
-	}
-	symbolToken, wasSymbol := token.(tokenize.SymbolToken)
-	if !wasSymbol {
-		return "", fmt.Errorf("Wasn't a symbol")
-	}
-
-	return symbolToken.Symbol, nil
-}
-
-func (p *Parser) parseString() (string, error) {
-	token, tokenErr := p.readNext()
-	if tokenErr != nil {
-		return "", tokenErr
-	}
-	stringToken, wasString := token.(tokenize.StringToken)
-	if !wasString {
-		return "", fmt.Errorf("Wasn't a string")
-	}
-
-	return stringToken.Text(), nil
-}
-
-func (p *Parser) parseMetaData() (definition.MetaData, error) {
-	metaData := definition.MetaData{Values: make(map[string]string)}
-	for true {
-		token, tokenErr := p.readNext()
-		if tokenErr != nil {
-			return definition.MetaData{}, tokenErr
-		}
-		symbolToken, wasSymbol := token.(tokenize.SymbolToken)
-		if wasSymbol {
-			metaName := symbolToken.Symbol
-			metaValue, metaValueErr := p.parseString()
-			if metaValueErr != nil {
-				return definition.MetaData{}, fmt.Errorf("Expected a meta value (%v)", metaValueErr)
-			}
-			metaData.Values[metaName] = metaValue
-		} else {
-			_, wasEndOfMetaData := token.(tokenize.EndMetaDataToken)
-			if !wasEndOfMetaData {
-				return definition.MetaData{}, fmt.Errorf("Expected a meta value or end of meta (%v)", token)
-			}
-			break
-		}
-	}
-
-	return metaData, nil
-}
-
-func (p *Parser) parseField(index int, name string) (*definition.Field, error) {
-	fieldType, fieldTypeErr := p.parseSymbol()
-	if fieldTypeErr != nil {
-		return &definition.Field{}, fmt.Errorf("Expected a field symbol (%v)", fieldTypeErr)
-	}
-
-	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
-	if hopefullyLineDelimiterErr != nil {
-		return nil, hopefullyLineDelimiterErr
-	}
-
-	_, isStartMeta := hopefullyLineDelimiter.(tokenize.StartMetaDataToken)
-	var metaData definition.MetaData
-	if isStartMeta {
-		var metaDataErr error
-		metaData, metaDataErr = p.parseMetaData()
-		if metaDataErr != nil {
-			return nil, metaDataErr
-		}
-		hopefullyLineDelimiter, hopefullyLineDelimiterErr = p.readNext()
-		if hopefullyLineDelimiterErr != nil {
-			return nil, hopefullyLineDelimiterErr
-		}
-	}
-	_, wasEndOfLine := hopefullyLineDelimiter.(tokenize.LineDelimiterToken)
-	if !wasEndOfLine {
-		return nil, fmt.Errorf("Must end lines after field type")
-	}
-
-	field := definition.NewField(index, name, fieldType, metaData)
-	return field, nil
-}
-
-func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
-	var fields []*definition.Field
-
-	for true {
-		token, tokenErr := p.readNext()
-		if tokenErr != nil {
-			return nil, tokenErr
-		}
-		symbolToken, wasSymbol := token.(tokenize.SymbolToken)
-		if !wasSymbol {
-			_, wasEndScope := token.(tokenize.EndScopeToken)
-			if wasEndScope {
-				return fields, nil
-			}
-			return nil, fmt.Errorf("Expected fieldname or end of scope")
-		}
-
-		parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
-		if parseFieldErr != nil {
-			return nil, parseFieldErr
-		}
-		fields = append(fields, parsedField)
-	}
-	return nil, nil
-}
-
-func (p *Parser) parseStartScope() error {
-	maybeStartScope, maybeStartScopeErr := p.readNext()
-	if maybeStartScopeErr != nil {
-		return maybeStartScopeErr
-	}
-
-	_, wasStartScope := maybeStartScope.(tokenize.StartScopeToken)
-	if !wasStartScope {
-		return fmt.Errorf("Missing start scope")
-	}
-
-	return nil
-}
-
-func (p *Parser) parseNameAndStartScope() (string, error) {
-	name, symbolErr := p.parseSymbol()
-	if symbolErr != nil {
-		return "", symbolErr
-	}
-	startScopeErr := p.parseStartScope()
-	if startScopeErr != nil {
-		return "", startScopeErr
-	}
-
-	return name, nil
-}
-
-func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
-	name, nameErr := p.parseNameAndStartScope()
-	if nameErr != nil {
-		return "", nil, nameErr
-	}
-	fields, fieldsErr := p.parseFieldsUntilEndScope()
-	if fieldsErr != nil {
-		return "", nil, fieldsErr
-	}
-	return name, fields, nil
-}
-
-func (p *Parser) parseComponent() (*definition.Component, error) {
-	name, fields, err := p.parseNameAndFields()
-	if err != nil {
-		return nil, err
-	}
-	component := definition.NewComponent(name, fields)
-	return component, nil
-}
-
-func (p *Parser) parseUserType() (*definition.UserType, error) {
-	name, fields, err := p.parseNameAndFields()
-	if err != nil {
-		return nil, err
-	}
-	userType := definition.NewUserType(name, fields)
-	return userType, nil
-}
-
-func (p *Parser) parseEntity() (*definition.Entity, error) {
-	name, fields, err := p.parseNameAndFields()
-	if err != nil {
-		return nil, err
-	}
-	var componentFields []*definition.ComponentField
-	for _, fieldComponent := range fields {
-		componentType := p.root.FindComponent(fieldComponent.FieldType())
-		componentField := definition.NewComponentField(len(componentFields), fieldComponent.Name(), componentType)
-		componentFields = append(componentFields, componentField)
-	}
-	entity := definition.NewEntity(name, componentFields)
-	return entity, nil
-}
-
 func (p *Parser) next() (bool, error) {
-	token, tokenErr := p.readNext()
-	if token == nil {
+	t, tokenErr := p.readNext()
+	if t == nil {
 		return true, nil
 	}
 	if tokenErr != nil {
 		return false, tokenErr
 	}
-	symbolToken, wasSymbol := token.(tokenize.SymbolToken)
+	symbolToken, wasSymbol := t.(token.SymbolToken)
 	if wasSymbol {
 		switch symbolToken.Symbol {
 		case "component":
@@ -282,7 +102,7 @@ func (p *Parser) next() (bool, error) {
 			return false, fmt.Errorf("Unknown keyword %v", symbolToken)
 		}
 	} else {
-		return false, fmt.Errorf("Unexpected token: %v", token)
+		return false, fmt.Errorf("Unexpected token: %v", t)
 	}
 	return false, nil
 }

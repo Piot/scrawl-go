@@ -29,11 +29,14 @@ package tokenize
 import (
 	"strings"
 	"testing"
+
+	"github.com/piot/scrawl-go/src/runestream"
+	"github.com/piot/scrawl-go/src/token"
 )
 
 func setup(x string) *Tokenizer {
 	ioReader := strings.NewReader(x)
-	runeReader := NewRuneReader(ioReader)
+	runeReader := runestream.NewRuneReader(ioReader)
 	tokenizer := NewTokenizer(runeReader)
 	return tokenizer
 }
@@ -55,7 +58,40 @@ func expectSymbol(t *testing.T, tokenizer *Tokenizer, expectedString string) {
 	if hopefullySymbolTokenErr != nil {
 		t.Error(hopefullySymbolTokenErr)
 	}
-	_, ok := hopefullySymbolToken.(SymbolToken)
+	_, ok := hopefullySymbolToken.(token.SymbolToken)
+	if !ok {
+		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
+	}
+}
+
+func expectNumber(t *testing.T, tokenizer *Tokenizer, expectedValue float64) {
+	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.ReadNext()
+	if hopefullySymbolTokenErr != nil {
+		t.Error(hopefullySymbolTokenErr)
+	}
+	_, ok := hopefullySymbolToken.(token.NumberToken)
+	if !ok {
+		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
+	}
+}
+
+func expectStartMeta(t *testing.T, tokenizer *Tokenizer) {
+	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.ReadNext()
+	if hopefullySymbolTokenErr != nil {
+		t.Error(hopefullySymbolTokenErr)
+	}
+	_, ok := hopefullySymbolToken.(token.StartMetaDataToken)
+	if !ok {
+		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
+	}
+}
+
+func expectEndMeta(t *testing.T, tokenizer *Tokenizer) {
+	hopefullySymbolToken, hopefullySymbolTokenErr := tokenizer.ReadNext()
+	if hopefullySymbolTokenErr != nil {
+		t.Error(hopefullySymbolTokenErr)
+	}
+	_, ok := hopefullySymbolToken.(token.EndMetaDataToken)
 	if !ok {
 		t.Errorf("Wrong type. Expected Symbol but was %v", hopefullySymbolToken)
 	}
@@ -66,7 +102,7 @@ func expectString(t *testing.T, tokenizer *Tokenizer, expectedString string) {
 	if hopefullyStringTokenErr != nil {
 		t.Error(hopefullyStringTokenErr)
 	}
-	_, ok := hopefullyStringToken.(StringToken)
+	_, ok := hopefullyStringToken.(token.StringToken)
 	if !ok {
 		t.Errorf("Wrong type. Expected String but was %v", hopefullyStringToken)
 	}
@@ -78,7 +114,7 @@ func expectStartScope(t *testing.T, tokenizer *Tokenizer) {
 		t.Error(maybeStartScopeErr)
 	}
 
-	_, ok := maybeStartScope.(StartScopeToken)
+	_, ok := maybeStartScope.(token.StartScopeToken)
 	if !ok {
 		t.Errorf("Couldn't cast to start scope token")
 	}
@@ -90,7 +126,7 @@ func expectEndScope(t *testing.T, tokenizer *Tokenizer) {
 		t.Error(maybeEndScopeErr)
 	}
 
-	_, ok := maybeEndScope.(EndScopeToken)
+	_, ok := maybeEndScope.(token.EndScopeToken)
 	if !ok {
 		t.Errorf("Couldn't cast to end scope token")
 	}
@@ -102,7 +138,7 @@ func expectLineDelimiter(t *testing.T, tokenizer *Tokenizer) {
 		t.Error(maybeStartScopeErr)
 	}
 
-	_, ok := maybeStartScope.(LineDelimiterToken)
+	_, ok := maybeStartScope.(token.LineDelimiterToken)
 	if !ok {
 		t.Errorf("Expected LineDelimiter but got %v", maybeStartScope)
 	}
@@ -124,9 +160,9 @@ func TestIndentationSymbol(t *testing.T) {
 namespace TheSpace
   component Something
 
-    hello int32
+    hello int32 [world 4]
 
-    type Another
+    type , Another
 `)
 
 	expectSymbol(t, tokenizer, "namespace")
@@ -137,6 +173,10 @@ namespace TheSpace
 	expectStartScope(t, tokenizer)
 	expectSymbol(t, tokenizer, "hello")
 	expectSymbol(t, tokenizer, "int32")
+	expectStartMeta(t, tokenizer)
+	expectSymbol(t, tokenizer, "world")
+	expectNumber(t, tokenizer, 4.0)
+	expectEndMeta(t, tokenizer)
 	expectLineDelimiter(t, tokenizer)
 	expectSymbol(t, tokenizer, "type")
 	expectSymbol(t, tokenizer, "Another")

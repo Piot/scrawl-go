@@ -24,31 +24,24 @@ SOFTWARE.
 
 */
 
-package tokenize
+package token
 
-import (
-	"bufio"
-	"io"
-)
+import "fmt"
 
-// RuneReader :
-type RuneReader struct {
-	r *bufio.Reader
+// SymbolToken :
+type SymbolToken struct {
+	Symbol   string
+	position Position
 }
 
-// NewRuneReader :
-func NewRuneReader(r io.Reader) *RuneReader {
-	return &RuneReader{r: bufio.NewReader(r)}
+func NewSymbolToken(a string, startPosition Position) SymbolToken {
+	return SymbolToken{Symbol: a, position: startPosition}
 }
 
-func (s *RuneReader) read() rune {
-	ch, _, err := s.r.ReadRune()
-	if err != nil {
-		return 0
-	}
-	return ch
+func (s SymbolToken) Position() Position {
+	return s.position
 }
 
-func (s *RuneReader) unread() {
-	_ = s.r.UnreadRune()
+func (s SymbolToken) String() string {
+	return fmt.Sprintf("Symbol:%s", s.Symbol)
 }

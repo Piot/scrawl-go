@@ -26,68 +26,38 @@ SOFTWARE.
 
 package definition
 
-import (
-	"fmt"
-)
+import "fmt"
 
-type Type struct {
-	name string
+type Field struct {
+	index     int
+	name      string
+	fieldType string
+	metaData  MetaData
 }
 
-type Root struct {
-	components []*Component
-	userTypes  []*UserType
-	entities   []*Entity
+func NewField(index int, name string, fieldType string, metaData MetaData) *Field {
+	return &Field{index: index, name: name, fieldType: fieldType, metaData: metaData}
 }
 
-func (r *Root) FindComponent(name string) *Component {
-	for _, component := range r.components {
-		if component.Name() == name {
-			return component
-		}
-	}
-	return nil
+func (c *Field) Index() int {
+	return c.index
 }
 
-func (r *Root) FindEntity(name string) *Entity {
-	for _, entity := range r.entities {
-		if entity.Name() == name {
-			return entity
-		}
-	}
-	return nil
+func (c *Field) Name() string {
+	return c.name
 }
 
-func (r *Root) String() string {
+func (c *Field) FieldType() string {
+	return c.fieldType
+}
+
+func (c *Field) MetaData() MetaData {
+	return c.metaData
+}
+
+func (c *Field) String() string {
 	var s string
-
-	s += fmt.Sprintf("Components: %d\n", len(r.components))
-	s += fmt.Sprintf("Entities: %d\n", len(r.entities))
-	s += fmt.Sprintf("UserTypes: %d\n", len(r.userTypes))
-
-	for _, entity := range r.entities {
-		s += entity.String() + "\n"
-	}
+	s += fmt.Sprintf("[field '%v' %v]", c.name, c.fieldType)
 
 	return s
-}
-
-func (r *Root) Components() []*Component {
-	return r.components
-}
-
-func (r *Root) Entities() []*Entity {
-	return r.entities
-}
-
-func (r *Root) AddComponent(c *Component) {
-	r.components = append(r.components, c)
-}
-
-func (r *Root) AddUserType(c *UserType) {
-	r.userTypes = append(r.userTypes, c)
-}
-
-func (r *Root) AddEntity(c *Entity) {
-	r.entities = append(r.entities, c)
 }

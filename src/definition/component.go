@@ -26,68 +26,31 @@ SOFTWARE.
 
 package definition
 
-import (
-	"fmt"
-)
+import "fmt"
 
-type Type struct {
-	name string
+type Component struct {
+	name   string
+	fields []*Field
 }
 
-type Root struct {
-	components []*Component
-	userTypes  []*UserType
-	entities   []*Entity
+func NewComponent(name string, fields []*Field) *Component {
+	return &Component{name: name, fields: fields}
 }
 
-func (r *Root) FindComponent(name string) *Component {
-	for _, component := range r.components {
-		if component.Name() == name {
-			return component
-		}
-	}
-	return nil
+func (c *Component) Name() string {
+	return c.name
 }
 
-func (r *Root) FindEntity(name string) *Entity {
-	for _, entity := range r.entities {
-		if entity.Name() == name {
-			return entity
-		}
-	}
-	return nil
+func (c *Component) Fields() []*Field {
+	return c.fields
 }
 
-func (r *Root) String() string {
+func (c *Component) String() string {
 	var s string
-
-	s += fmt.Sprintf("Components: %d\n", len(r.components))
-	s += fmt.Sprintf("Entities: %d\n", len(r.entities))
-	s += fmt.Sprintf("UserTypes: %d\n", len(r.userTypes))
-
-	for _, entity := range r.entities {
-		s += entity.String() + "\n"
+	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
+	for _, field := range c.fields {
+		s += "    " + field.String() + "\n"
 	}
 
 	return s
-}
-
-func (r *Root) Components() []*Component {
-	return r.components
-}
-
-func (r *Root) Entities() []*Entity {
-	return r.entities
-}
-
-func (r *Root) AddComponent(c *Component) {
-	r.components = append(r.components, c)
-}
-
-func (r *Root) AddUserType(c *UserType) {
-	r.userTypes = append(r.userTypes, c)
-}
-
-func (r *Root) AddEntity(c *Entity) {
-	r.entities = append(r.entities, c)
 }
