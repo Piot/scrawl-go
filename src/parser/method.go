@@ -24,29 +24,15 @@ SOFTWARE.
 
 */
 
-package writer
+package parser
 
-import (
-	"fmt"
+import "github.com/piot/scrawl-go/src/definition"
 
-	"github.com/piot/scrawl-go/src/definition"
-)
-
-func WriteCSharp(root *definition.Root) {
-	for _, component := range root.Components() {
-		fmt.Printf("public class %s \n{\n", component.Name())
-		for _, field := range component.Fields() {
-			fmt.Printf(" public %s %s;\n", field.FieldType(), field.Name())
-		}
-
-		fmt.Printf("}\n")
+func (p *Parser) parseMethod() (*definition.Method, error) {
+	name, fields, err := p.parseNameAndFields()
+	if err != nil {
+		return nil, err
 	}
-
-	for _, entity := range root.Entities() {
-		fmt.Printf("public class %s\n{\n", entity.Name())
-		for _, field := range entity.Components() {
-			fmt.Printf(" public %s %s;\n", field.Component().Name(), field.Name())
-		}
-		fmt.Printf("}\n")
-	}
+	method := definition.NewMethod(name, fields, "not sure")
+	return method, nil
 }

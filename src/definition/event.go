@@ -24,29 +24,26 @@ SOFTWARE.
 
 */
 
-package writer
+package definition
 
-import (
-	"fmt"
+import "fmt"
 
-	"github.com/piot/scrawl-go/src/definition"
-)
+type Event struct {
+	name   string
+	fields []*Field
+}
 
-func WriteCSharp(root *definition.Root) {
-	for _, component := range root.Components() {
-		fmt.Printf("public class %s \n{\n", component.Name())
-		for _, field := range component.Fields() {
-			fmt.Printf(" public %s %s;\n", field.FieldType(), field.Name())
-		}
+func NewEvent(name string, fields []*Field) *Event {
+	return &Event{name: name, fields: fields}
+}
 
-		fmt.Printf("}\n")
-	}
+func (e *Event) Name() string {
+	return e.name
+}
 
-	for _, entity := range root.Entities() {
-		fmt.Printf("public class %s\n{\n", entity.Name())
-		for _, field := range entity.Components() {
-			fmt.Printf(" public %s %s;\n", field.Component().Name(), field.Name())
-		}
-		fmt.Printf("}\n")
-	}
+func (e *Event) String() string {
+	var s string
+	s += fmt.Sprintf("[event '%v' %v]", e.name, e.fields)
+
+	return s
 }

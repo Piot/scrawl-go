@@ -24,29 +24,18 @@ SOFTWARE.
 
 */
 
-package writer
+package definition
 
-import (
-	"fmt"
+type Method struct {
+	name       string
+	fields     []*Field
+	returnType string
+}
 
-	"github.com/piot/scrawl-go/src/definition"
-)
+func NewMethod(name string, fields []*Field, returnType string) *Method {
+	return &Method{name: name, fields: fields, returnType: returnType}
+}
 
-func WriteCSharp(root *definition.Root) {
-	for _, component := range root.Components() {
-		fmt.Printf("public class %s \n{\n", component.Name())
-		for _, field := range component.Fields() {
-			fmt.Printf(" public %s %s;\n", field.FieldType(), field.Name())
-		}
-
-		fmt.Printf("}\n")
-	}
-
-	for _, entity := range root.Entities() {
-		fmt.Printf("public class %s\n{\n", entity.Name())
-		for _, field := range entity.Components() {
-			fmt.Printf(" public %s %s;\n", field.Component().Name(), field.Name())
-		}
-		fmt.Printf("}\n")
-	}
+func (m *Method) Name() string {
+	return m.name
 }

@@ -98,6 +98,19 @@ func (p *Parser) next() (bool, error) {
 				return false, err
 			}
 			p.root.AddEntity(entity)
+		case "event":
+			event, err := p.parseEvent()
+			if err != nil {
+				return false, err
+
+			}
+			p.root.AddEvent(event)
+		case "method":
+			method, err := p.parseMethod()
+			if err != nil {
+				return false, err
+			}
+			p.root.AddMethod(method)
 		default:
 			return false, fmt.Errorf("Unknown keyword %v", symbolToken)
 		}

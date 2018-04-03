@@ -30,11 +30,12 @@ import "fmt"
 
 type Entity struct {
 	name            string
+	entityTypeID    EntityTypeID
 	componentFields []*ComponentField
 }
 
 func NewEntity(name string, componentFields []*ComponentField) *Entity {
-	return &Entity{name: name, componentFields: componentFields}
+	return &Entity{name: name, entityTypeID: NewEntityTypeIDFromString(name), componentFields: componentFields}
 }
 
 func (c *Entity) String() string {
@@ -49,6 +50,10 @@ func (c *Entity) String() string {
 
 func (c *Entity) Name() string {
 	return c.name
+}
+
+func (c *Entity) ID() EntityTypeID {
+	return c.entityTypeID
 }
 
 func (c *Entity) Component(index int) *ComponentField {

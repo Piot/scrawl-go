@@ -94,9 +94,17 @@ type SomeType
 component AnotherComponent
   usingTheType int [range "34-45", debug "hello world"]
   Name string
-
+  
 entity ThisISTheEntity2
-  shouldTypeSomething Here
+  shouldTypeSomething AnotherComponent
+
+event Jump
+  where Position
+  energy int [range "10-34"]
+
+method FetchName
+  index int
+  returns int
 `)
 
 	if err != nil {
@@ -108,6 +116,10 @@ entity ThisISTheEntity2
 		t.Errorf("Wrong number of components:%v", len(def.Components()))
 	}
 
+	event := def.Events()[0]
+	if event.Name() != "Jump" {
+		t.Errorf("Wrong event name:%v", event)
+	}
 	firstComponent := def.Components()[0]
 	firstComponentName := firstComponent.Name()
 	if firstComponentName != "AnotherComponent" {

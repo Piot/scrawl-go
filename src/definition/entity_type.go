@@ -24,29 +24,31 @@ SOFTWARE.
 
 */
 
-package writer
+package definition
 
-import (
-	"fmt"
+import "hash/fnv"
 
-	"github.com/piot/scrawl-go/src/definition"
-)
+// EntityTypeID :
+type EntityTypeID struct {
+	id uint16
+}
 
-func WriteCSharp(root *definition.Root) {
-	for _, component := range root.Components() {
-		fmt.Printf("public class %s \n{\n", component.Name())
-		for _, field := range component.Fields() {
-			fmt.Printf(" public %s %s;\n", field.FieldType(), field.Name())
-		}
+func (e EntityTypeID) Value() uint16 {
+	return e.id
+}
 
-		fmt.Printf("}\n")
-	}
+func hash(s string) uint32 {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return h.Sum32()
+}
 
-	for _, entity := range root.Entities() {
-		fmt.Printf("public class %s\n{\n", entity.Name())
-		for _, field := range entity.Components() {
-			fmt.Printf(" public %s %s;\n", field.Component().Name(), field.Name())
-		}
-		fmt.Printf("}\n")
-	}
+func typeHash(name string) uint16 {
+	v := hash(name)
+	w := uint16((v >> 16) ^ (v & 0xffff))
+	return w
+}
+
+func NewEntityTypeIDFromString(name string) EntityTypeID {
+	return EntityTypeID{id: typeHash(name)}
 }

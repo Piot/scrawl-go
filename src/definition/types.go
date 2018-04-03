@@ -38,6 +38,8 @@ type Root struct {
 	components []*Component
 	userTypes  []*UserType
 	entities   []*Entity
+	methods    []*Method
+	events     []*Event
 }
 
 func (r *Root) FindComponent(name string) *Component {
@@ -76,6 +78,14 @@ func (r *Root) Components() []*Component {
 	return r.components
 }
 
+func (r *Root) Events() []*Event {
+	return r.events
+}
+
+func (r *Root) Methods() []*Method {
+	return r.methods
+}
+
 func (r *Root) Entities() []*Entity {
 	return r.entities
 }
@@ -90,4 +100,12 @@ func (r *Root) AddUserType(c *UserType) {
 
 func (r *Root) AddEntity(c *Entity) {
 	r.entities = append(r.entities, c)
+}
+
+func (r *Root) AddEvent(c *Event) {
+	r.events = append(r.events, c)
+}
+
+func (r *Root) AddMethod(c *Method) {
+	r.methods = append(r.methods, c)
 }
