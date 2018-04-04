@@ -26,16 +26,16 @@ SOFTWARE.
 
 package definition
 
-type Method struct {
+type Command struct {
 	name       string
 	fields     []*Field
 	returnType string
 }
 
-func NewMethod(name string, fields []*Field, returnType string) *Method {
-	return &Method{name: name, fields: fields, returnType: returnType}
+func NewCommand(name string, fields []*Field, returnType string) *Command {
+	return &Command{name: name, fields: fields, returnType: returnType}
 }
 
-func (m *Method) Name() string {
-	return m.name
+func (c *Command) Name() string {
+	return c.name
 }

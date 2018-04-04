@@ -38,7 +38,7 @@ type Root struct {
 	components []*Component
 	userTypes  []*UserType
 	entities   []*Entity
-	methods    []*Method
+	commands   []*Command
 	events     []*Event
 }
 
@@ -82,8 +82,8 @@ func (r *Root) Events() []*Event {
 	return r.events
 }
 
-func (r *Root) Methods() []*Method {
-	return r.methods
+func (r *Root) Commands() []*Command {
+	return r.commands
 }
 
 func (r *Root) Entities() []*Entity {
@@ -106,6 +106,6 @@ func (r *Root) AddEvent(c *Event) {
 	r.events = append(r.events, c)
 }
 
-func (r *Root) AddMethod(c *Method) {
-	r.methods = append(r.methods, c)
+func (r *Root) AddMethod(c *Command) {
+	r.commands = append(r.commands, c)
 }

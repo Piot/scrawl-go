@@ -105,8 +105,8 @@ func (p *Parser) next() (bool, error) {
 
 			}
 			p.root.AddEvent(event)
-		case "method":
-			method, err := p.parseMethod()
+		case "command":
+			method, err := p.parseCommand()
 			if err != nil {
 				return false, err
 			}

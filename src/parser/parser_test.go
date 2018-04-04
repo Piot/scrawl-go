@@ -94,7 +94,7 @@ type SomeType
 component AnotherComponent
   usingTheType int [range "34-45", debug "hello world"]
   Name string
-  
+
 entity ThisISTheEntity2
   shouldTypeSomething AnotherComponent
 
@@ -102,7 +102,7 @@ event Jump
   where Position
   energy int [range "10-34"]
 
-method FetchName
+command FetchName
   index int
   returns int
 `)

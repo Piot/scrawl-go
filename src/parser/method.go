@@ -28,11 +28,11 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseMethod() (*definition.Method, error) {
+func (p *Parser) parseCommand() (*definition.Command, error) {
 	name, fields, err := p.parseNameAndFields()
 	if err != nil {
 		return nil, err
 	}
-	method := definition.NewMethod(name, fields, "not sure")
+	method := definition.NewCommand(name, fields, "")
 	return method, nil
 }
