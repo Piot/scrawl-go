@@ -26,13 +26,45 @@ SOFTWARE.
 
 package parser
 
-import "github.com/piot/scrawl-go/src/definition"
+import (
+	"fmt"
+
+	"github.com/piot/scrawl-go/src/definition"
+	"github.com/piot/scrawl-go/src/token"
+)
+
+func (p *Parser) parseCommandNameParameterAndReturn() (string, string, string, error) {
+	name, symbolErr := p.parseSymbol()
+	if symbolErr != nil {
+		return "", "", "", symbolErr
+	}
+	parameter, parameterErr := p.parseSymbol()
+	if parameterErr != nil {
+		return "", "", "", parameterErr
+	}
+	returnType, returnTypeErr := p.parseSymbol()
+	if returnTypeErr != nil {
+		return "", "", "", returnTypeErr
+	}
+
+	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
+	if hopefullyLineDelimiterErr != nil {
+		return "", "", "", hopefullyLineDelimiterErr
+	}
+
+	_, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	if !wasEndOfLine {
+		return "", "", "", fmt.Errorf("Must end lines after field type")
+	}
+
+	return name, parameter, returnType, nil
+}
 
 func (p *Parser) parseCommand() (*definition.Command, error) {
-	name, fields, err := p.parseNameAndFields()
+	name, parameter, returnType, err := p.parseCommandNameParameterAndReturn()
 	if err != nil {
 		return nil, err
 	}
-	method := definition.NewCommand(name, fields, "")
+	method := definition.NewCommand(name, parameter, returnType)
 	return method, nil
 }

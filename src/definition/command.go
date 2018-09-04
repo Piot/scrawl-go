@@ -28,12 +28,12 @@ package definition
 
 type Command struct {
 	name       string
-	fields     []*Field
+	parameter  string
 	returnType string
 }
 
-func NewCommand(name string, fields []*Field, returnType string) *Command {
-	return &Command{name: name, fields: fields, returnType: returnType}
+func NewCommand(name string, parameter string, returnType string) *Command {
+	return &Command{name: name, parameter: parameter, returnType: returnType}
 }
 
 func (c *Command) Name() string {

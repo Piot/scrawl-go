@@ -1,0 +1,12 @@
+type Strength
+  big int
+  small int
+
+type Attack
+  strength Strength
+  time int
+
+type AttackResult
+  stillWorking bool
+
+command attack Attack AttackResult
