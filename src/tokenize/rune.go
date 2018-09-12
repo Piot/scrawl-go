@@ -43,7 +43,7 @@ func isLegalIndentationWhiteSpace(ch rune) bool {
 }
 
 func isWhitespaceExceptNewLine(ch rune) bool {
-	return (ch == ' ' || ch == '\t')
+	return (ch == ' ' || ch == '\t' || ch == '\r')
 }
 
 func isIllegalDuringIndentation(ch rune) bool {

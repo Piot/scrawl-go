@@ -126,6 +126,9 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 	if isNewLine(r) {
 		return t.parseNewLine()
 	} else {
+		if isWhitespaceExceptNewLine(r) {
+			return t.internalReadNext()
+		}
 		t.lastTokenWasDelimiter = false
 		if isLetter(r) {
 			t.unreadRune()
@@ -139,8 +142,6 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 			return token.NewStartMetaDataToken(t.position), nil
 		} else if isEndMetaData(r) {
 			return token.NewEndMetaDataToken(t.position), nil
-		} else if isWhitespaceExceptNewLine(r) {
-			return t.internalReadNext()
 		} else if r == ',' {
 			return t.internalReadNext()
 		} else if r == 0 {
