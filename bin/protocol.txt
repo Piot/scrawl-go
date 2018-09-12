@@ -9,4 +9,6 @@ type Attack
 type AttackResult
   stillWorking bool
 
-command attack Attack AttackResult
+component Tough
+  command attack Attack AttackResult
+  

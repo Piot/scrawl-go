@@ -84,6 +84,25 @@ component Something
 	}
 }
 
+func TestIgnoringCarriageReturn(t *testing.T) {
+	setup, err := setup(
+		"component SomeType\r\n" +
+			"  hello	 int32\r\n" +
+			"  type \r  Another\r\n\r" +
+			"")
+	if err != nil {
+		t.Error(err)
+	}
+	components := setup.Root().Components()
+	if len(components) != 1 {
+		t.Errorf("Should have been 1")
+	}
+
+	if components[0].Name() != "SomeType" {
+		t.Errorf("Wrong name")
+	}
+}
+
 func TestEverything(t *testing.T) {
 	parser, err := setup(
 		`
@@ -102,9 +121,11 @@ event Jump
   where Position
   energy int [range "10-34"]
 
-command FetchName
-  index int
-  returns int
+type ReturnType
+  hello	 int32
+  type   Another
+
+command FetchName SomeType ReturnType
 `)
 
 	if err != nil {

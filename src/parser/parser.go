@@ -137,7 +137,11 @@ func NewParser(text string) (*Parser, error) {
 	if err != nil {
 		_, wasTokenizerError := err.(tokenize.TokenizerError)
 		if !wasTokenizerError {
-			parserErr = ParserError{err: err, position: parser.lastToken.Position()}
+			if parser.lastToken == nil {
+				parserErr = ParserError{err: err, position: token.Position{}}
+			} else {
+				parserErr = ParserError{err: err, position: parser.lastToken.Position()}
+			}
 		} else {
 			parserErr = err
 		}
