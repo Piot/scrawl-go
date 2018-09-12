@@ -28,8 +28,6 @@ package parser
 
 import (
 	"testing"
-
-	"github.com/piot/scrawl-go/src/writer"
 )
 
 func setup(x string) (*Parser, error) {
@@ -173,6 +171,4 @@ command FetchName SomeType ReturnType
 	if fields[1].FieldType() != "string" {
 		t.Errorf("Wrong field name:%v", fields[1].FieldType())
 	}
-
-	writer.WriteCSharp(def)
 }
