@@ -34,3 +34,7 @@ type UserType struct {
 func NewUserType(name string, fields []*Field) *UserType {
 	return &UserType{name: name, fields: fields}
 }
+
+func (u *UserType) Fields() []*Field {
+	return u.fields
+}

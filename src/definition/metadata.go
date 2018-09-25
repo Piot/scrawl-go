@@ -36,3 +36,11 @@ func (m *MetaData) Int(name string) (int, error) {
 	s := m.Values[name]
 	return strconv.Atoi(s)
 }
+
+func (m *MetaData) IntWithDefault(name string, defaultValue int) (int, error) {
+	s := m.Values[name]
+	if s == "" {
+		return defaultValue, nil
+	}
+	return strconv.Atoi(s)
+}

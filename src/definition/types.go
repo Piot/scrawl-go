@@ -60,6 +60,15 @@ func (r *Root) FindEntity(name string) *Entity {
 	return nil
 }
 
+func (r *Root) FindUserType(name string) *UserType {
+	for _, userType := range r.userTypes {
+		if userType.name == name {
+			return userType
+		}
+	}
+	return nil
+}
+
 func (r *Root) String() string {
 	var s string
 
