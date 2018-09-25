@@ -29,16 +29,29 @@ package definition
 import "fmt"
 
 type Event struct {
-	name   string
-	fields []*Field
+	name        string
+	fields      []*Field
+	eventTypeID EntityTypeID
 }
 
 func NewEvent(name string, fields []*Field) *Event {
-	return &Event{name: name, fields: fields}
+
+	return &Event{
+		name:        name,
+		fields:      fields,
+		eventTypeID: NewEntityTypeIDFromString(name)}
+}
+
+func (e *Event) Fields() []*Field {
+	return e.fields
 }
 
 func (e *Event) Name() string {
 	return e.name
+}
+
+func (c *Event) ID() EntityTypeID {
+	return c.eventTypeID
 }
 
 func (e *Event) String() string {
