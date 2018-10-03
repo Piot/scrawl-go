@@ -28,34 +28,34 @@ package definition
 
 import "fmt"
 
-type Component struct {
-	name            string
-	fields          []*Field
-	eventReferences []*EventReference
+type EventReference struct {
+	eventType   string
+	name        string
+	eventTypeID EntityTypeID
 }
 
-func NewComponent(name string, fields []*Field, eventReferences []*EventReference) *Component {
-	return &Component{name: name, fields: fields, eventReferences: eventReferences}
+func NewEventReference(name string, eventType string) *EventReference {
+	return &EventReference{
+		name:        name,
+		eventTypeID: NewEntityTypeIDFromString(name + "_" + eventType),
+		eventType:   eventType}
 }
 
-func (c *Component) Name() string {
-	return c.name
+func (e *EventReference) ReferencedType() string {
+	return e.eventType
 }
 
-func (c *Component) Fields() []*Field {
-	return c.fields
+func (e *EventReference) Name() string {
+	return e.name
 }
 
-func (c *Component) EventReferences() []*EventReference {
-	return c.eventReferences
+func (c *EventReference) ID() EntityTypeID {
+	return c.eventTypeID
 }
 
-func (c *Component) String() string {
+func (e *EventReference) String() string {
 	var s string
-	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
-	for _, field := range c.fields {
-		s += "    " + field.String() + "\n"
-	}
+	s += fmt.Sprintf("[eventreference '%v' %v]", e.name, e.eventType)
 
 	return s
 }

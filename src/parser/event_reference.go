@@ -24,38 +24,27 @@ SOFTWARE.
 
 */
 
-package definition
+package parser
 
-import "fmt"
+import "github.com/piot/scrawl-go/src/definition"
 
-type Component struct {
-	name            string
-	fields          []*Field
-	eventReferences []*EventReference
-}
+func (p *Parser) parseEventReference() (*definition.EventReference, error) {
 
-func NewComponent(name string, fields []*Field, eventReferences []*EventReference) *Component {
-	return &Component{name: name, fields: fields, eventReferences: eventReferences}
-}
-
-func (c *Component) Name() string {
-	return c.name
-}
-
-func (c *Component) Fields() []*Field {
-	return c.fields
-}
-
-func (c *Component) EventReferences() []*EventReference {
-	return c.eventReferences
-}
-
-func (c *Component) String() string {
-	var s string
-	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
-	for _, field := range c.fields {
-		s += "    " + field.String() + "\n"
+	name, symbolErr := p.parseSymbol()
+	if symbolErr != nil {
+		return nil, symbolErr
 	}
 
-	return s
+	eventTypeName, eventTypeNameErr := p.parseSymbol()
+	if eventTypeNameErr != nil {
+		return nil, eventTypeNameErr
+	}
+
+	hopefullyLineDelimiterErr := p.expectLineDelimiter()
+	if hopefullyLineDelimiterErr != nil {
+		return nil, hopefullyLineDelimiterErr
+	}
+
+	eventReference := definition.NewEventReference(name, eventTypeName)
+	return eventReference, nil
 }

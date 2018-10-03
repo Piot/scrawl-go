@@ -57,9 +57,9 @@ func (p *Parser) parseField(index int, name string) (*definition.Field, error) {
 			return nil, hopefullyLineDelimiterErr
 		}
 	}
-	_, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
 	if !wasEndOfLine {
-		return nil, fmt.Errorf("Must end lines after field type")
+		return nil, fmt.Errorf("Must end lines after field  token:%v", token)
 	}
 
 	field := definition.NewField(index, name, fieldType, metaData)

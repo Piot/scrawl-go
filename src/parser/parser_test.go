@@ -111,6 +111,10 @@ type SomeType
 component AnotherComponent
   usingTheType int [range "34-45", debug "hello world"]
   Name string
+  event CreatureJumped Jump
+
+component SomeOtherComponent
+  event AlienJumped Jump
 
 entity ThisISTheEntity2
   shouldTypeSomething AnotherComponent
@@ -131,7 +135,7 @@ command FetchName SomeType ReturnType
 	}
 
 	def := parser.Root()
-	if len(def.Components()) != 1 {
+	if len(def.Components()) != 2 {
 		t.Errorf("Wrong number of components:%v", len(def.Components()))
 	}
 
@@ -170,5 +174,19 @@ command FetchName SomeType ReturnType
 	}
 	if fields[1].FieldType() != "string" {
 		t.Errorf("Wrong field name:%v", fields[1].FieldType())
+	}
+
+	eventReferences := def.Components()[0].EventReferences()
+	if len(eventReferences) != 1 {
+		t.Errorf("Must have one event reference")
+	}
+
+	firstRef := eventReferences[0]
+	if firstRef.Name() != "CreatureJumped" {
+		t.Errorf("should be CreatureJumped")
+	}
+
+	if firstRef.ReferencedType() != "Jump" {
+		t.Errorf("wrong referenced type")
 	}
 }

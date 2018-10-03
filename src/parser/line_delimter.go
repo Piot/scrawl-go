@@ -24,38 +24,24 @@ SOFTWARE.
 
 */
 
-package definition
+package parser
 
-import "fmt"
+import (
+	"fmt"
 
-type Component struct {
-	name            string
-	fields          []*Field
-	eventReferences []*EventReference
-}
+	"github.com/piot/scrawl-go/src/token"
+)
 
-func NewComponent(name string, fields []*Field, eventReferences []*EventReference) *Component {
-	return &Component{name: name, fields: fields, eventReferences: eventReferences}
-}
-
-func (c *Component) Name() string {
-	return c.name
-}
-
-func (c *Component) Fields() []*Field {
-	return c.fields
-}
-
-func (c *Component) EventReferences() []*EventReference {
-	return c.eventReferences
-}
-
-func (c *Component) String() string {
-	var s string
-	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
-	for _, field := range c.fields {
-		s += "    " + field.String() + "\n"
+func (p *Parser) expectLineDelimiter() error {
+	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
+	if hopefullyLineDelimiterErr != nil {
+		return hopefullyLineDelimiterErr
 	}
 
-	return s
+	_, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	if !wasEndOfLine {
+		return fmt.Errorf("expected line delimiter")
+	}
+
+	return nil
 }

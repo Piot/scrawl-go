@@ -45,6 +45,18 @@ func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	return name, fields, nil
 }
 
+func (p *Parser) parseNameAndFieldsAndEvents() (string, []*definition.Field, []*definition.EventReference, error) {
+	name, nameErr := p.parseNameAndStartScope()
+	if nameErr != nil {
+		return "", nil, nil, nameErr
+	}
+	fields, eventReferences, fieldsErr := p.parseFieldsAndEventsUntilEndScope()
+	if fieldsErr != nil {
+		return "", nil, nil, fieldsErr
+	}
+	return name, fields, eventReferences, nil
+}
+
 func (p *Parser) parseNameAndStartScope() (string, error) {
 	name, symbolErr := p.parseSymbol()
 	if symbolErr != nil {
@@ -82,4 +94,42 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 		fields = append(fields, parsedField)
 	}
 	return nil, nil
+}
+
+func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*definition.EventReference, error) {
+	var fields []*definition.Field
+	var events []*definition.EventReference
+
+	for true {
+		t, tokenErr := p.readNext()
+		if tokenErr != nil {
+			return nil, nil, tokenErr
+		}
+		symbolToken, wasSymbol := t.(token.SymbolToken)
+		if !wasSymbol {
+			_, wasEndScope := t.(token.EndScopeToken)
+			if wasEndScope {
+				return fields, events, nil
+			}
+			return nil, nil, fmt.Errorf("Expected fieldname, event or end of scope")
+		}
+
+		isEvent := (symbolToken.Symbol == "event")
+
+		if isEvent {
+			fmt.Printf("Found EVENT:%v\n", symbolToken)
+			parsedEventReference, parsedEventErr := p.parseEventReference()
+			if parsedEventErr != nil {
+				return nil, nil, parsedEventErr
+			}
+			events = append(events, parsedEventReference)
+		} else {
+			parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
+			if parseFieldErr != nil {
+				return nil, nil, parseFieldErr
+			}
+			fields = append(fields, parsedField)
+		}
+	}
+	return nil, nil, nil
 }
