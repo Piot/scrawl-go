@@ -39,3 +39,7 @@ func NewCommand(name string, parameter string, returnType string) *Command {
 func (c *Command) Name() string {
 	return c.name
 }
+
+func (c *Command) ReturnTypeName() string {
+	return c.returnType
+}

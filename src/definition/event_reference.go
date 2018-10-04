@@ -30,23 +30,17 @@ import "fmt"
 
 type EventReference struct {
 	eventType   string
-	name        string
 	eventTypeID EntityTypeID
 }
 
-func NewEventReference(name string, eventType string) *EventReference {
+func NewEventReference(eventType string) *EventReference {
 	return &EventReference{
-		name:        name,
-		eventTypeID: NewEntityTypeIDFromString(name + "_" + eventType),
+		eventTypeID: NewEntityTypeIDFromString(eventType),
 		eventType:   eventType}
 }
 
 func (e *EventReference) ReferencedType() string {
 	return e.eventType
-}
-
-func (e *EventReference) Name() string {
-	return e.name
 }
 
 func (c *EventReference) ID() EntityTypeID {
@@ -55,7 +49,7 @@ func (c *EventReference) ID() EntityTypeID {
 
 func (e *EventReference) String() string {
 	var s string
-	s += fmt.Sprintf("[eventreference '%v' %v]", e.name, e.eventType)
+	s += fmt.Sprintf("[eventreference '%v' %v]", e.eventType)
 
 	return s
 }

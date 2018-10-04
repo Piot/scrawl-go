@@ -29,12 +29,12 @@ package parser
 import "github.com/piot/scrawl-go/src/definition"
 
 func (p *Parser) parseEventReference() (*definition.EventReference, error) {
-
-	name, symbolErr := p.parseSymbol()
-	if symbolErr != nil {
-		return nil, symbolErr
-	}
-
+	/*
+		name, symbolErr := p.parseSymbol()
+		if symbolErr != nil {
+			return nil, symbolErr
+		}
+	*/
 	eventTypeName, eventTypeNameErr := p.parseSymbol()
 	if eventTypeNameErr != nil {
 		return nil, eventTypeNameErr
@@ -45,6 +45,6 @@ func (p *Parser) parseEventReference() (*definition.EventReference, error) {
 		return nil, hopefullyLineDelimiterErr
 	}
 
-	eventReference := definition.NewEventReference(name, eventTypeName)
+	eventReference := definition.NewEventReference(eventTypeName)
 	return eventReference, nil
 }

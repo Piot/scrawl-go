@@ -38,3 +38,7 @@ func NewUserType(name string, fields []*Field) *UserType {
 func (u *UserType) Fields() []*Field {
 	return u.fields
 }
+
+func (u *UserType) TypeName() string {
+	return u.name
+}
