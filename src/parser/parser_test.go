@@ -111,10 +111,10 @@ type SomeType
 component AnotherComponent
   usingTheType int [range "34-45", debug "hello world"]
   Name string
-  event CreatureJumped Jump
+  event Jump
 
 component SomeOtherComponent
-  event AlienJumped Jump
+  event Jump
 
 entity ThisISTheEntity2
   shouldTypeSomething AnotherComponent
@@ -127,7 +127,7 @@ type ReturnType
   hello	 int32
   type   Another
 
-command FetchName SomeType ReturnType
+command CommandName SomeType ReturnType
 `)
 
 	if err != nil {
@@ -182,11 +182,24 @@ command FetchName SomeType ReturnType
 	}
 
 	firstRef := eventReferences[0]
-	if firstRef.Name() != "CreatureJumped" {
-		t.Errorf("should be CreatureJumped")
+	if firstRef.ReferencedType() != "Jump" {
+		t.Errorf("should be Jump")
 	}
 
 	if firstRef.ReferencedType() != "Jump" {
 		t.Errorf("wrong referenced type")
+	}
+
+	cmd := def.Commands()[0]
+	if cmd.Name() != "CommandName" {
+		t.Errorf("wrong command name %v", cmd)
+	}
+
+	if cmd.ParameterTypeName() != "SomeType" {
+		t.Errorf("Wrong argument type %v", cmd)
+	}
+
+	if cmd.ReturnTypeName() != "ReturnType" {
+		t.Errorf("wrong command return %v", cmd)
 	}
 }

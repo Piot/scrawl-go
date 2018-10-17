@@ -26,7 +26,10 @@ SOFTWARE.
 
 package definition
 
-import "hash/fnv"
+import (
+	"fmt"
+	"hash/fnv"
+)
 
 // EntityTypeID :
 type EntityTypeID struct {
@@ -35,6 +38,10 @@ type EntityTypeID struct {
 
 func (e EntityTypeID) Value() uint16 {
 	return e.id
+}
+
+func (e EntityTypeID) String() string {
+	return fmt.Sprintf("[entitytypeid %v]", e.id)
 }
 
 func hash(s string) uint32 {

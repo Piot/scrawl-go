@@ -49,7 +49,7 @@ func (c *EventReference) ID() EntityTypeID {
 
 func (e *EventReference) String() string {
 	var s string
-	s += fmt.Sprintf("[eventreference '%v' %v]", e.eventType)
+	s += fmt.Sprintf("[eventreference '%v' %v]", e.eventType, e.eventTypeID)
 
 	return s
 }

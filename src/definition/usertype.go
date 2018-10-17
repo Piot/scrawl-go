@@ -26,6 +26,8 @@ SOFTWARE.
 
 package definition
 
+import "fmt"
+
 type UserType struct {
 	name   string
 	fields []*Field
@@ -41,4 +43,8 @@ func (u *UserType) Fields() []*Field {
 
 func (u *UserType) TypeName() string {
 	return u.name
+}
+
+func (u *UserType) String() string {
+	return fmt.Sprintf("[usertype %v fields:%v]", u.name, u.fields)
 }

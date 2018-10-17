@@ -26,6 +26,10 @@ SOFTWARE.
 
 package definition
 
+import (
+	"fmt"
+)
+
 type Command struct {
 	name       string
 	parameter  string
@@ -42,4 +46,12 @@ func (c *Command) Name() string {
 
 func (c *Command) ReturnTypeName() string {
 	return c.returnType
+}
+
+func (c *Command) ParameterTypeName() string {
+	return c.parameter
+}
+
+func (c *Command) String() string {
+	return fmt.Sprintf("[command '%v'(%v) %v]", c.name, c.parameter, c.returnType)
 }
