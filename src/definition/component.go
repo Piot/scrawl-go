@@ -29,13 +29,14 @@ package definition
 import "fmt"
 
 type Component struct {
-	name            string
-	fields          []*Field
-	eventReferences []*EventReference
+	name              string
+	fields            []*Field
+	eventReferences   []*EventReference
+	commandReferences []*CommandReference
 }
 
-func NewComponent(name string, fields []*Field, eventReferences []*EventReference) *Component {
-	return &Component{name: name, fields: fields, eventReferences: eventReferences}
+func NewComponent(name string, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *Component {
+	return &Component{name: name, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
 }
 
 func (c *Component) Name() string {
@@ -48,6 +49,10 @@ func (c *Component) Fields() []*Field {
 
 func (c *Component) EventReferences() []*EventReference {
 	return c.eventReferences
+}
+
+func (c *Component) CommandReferences() []*CommandReference {
+	return c.commandReferences
 }
 
 func (c *Component) String() string {

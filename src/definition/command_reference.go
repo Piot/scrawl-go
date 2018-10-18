@@ -24,15 +24,32 @@ SOFTWARE.
 
 */
 
-package parser
+package definition
 
-import "github.com/piot/scrawl-go/src/definition"
+import "fmt"
 
-func (p *Parser) parseComponent() (*definition.Component, error) {
-	name, fields, eventReferences, commandReferences, err := p.parseNameAndFieldsAndReferences()
-	if err != nil {
-		return nil, err
-	}
-	component := definition.NewComponent(name, fields, eventReferences, commandReferences)
-	return component, nil
+type CommandReference struct {
+	commandType   string
+	commandTypeID EntityTypeID
+}
+
+func NewCommandReference(CommandType string) *CommandReference {
+	return &CommandReference{
+		commandTypeID: NewEntityTypeIDFromString(CommandType),
+		commandType:   CommandType}
+}
+
+func (e *CommandReference) ReferencedType() string {
+	return e.commandType
+}
+
+func (c *CommandReference) ID() EntityTypeID {
+	return c.commandTypeID
+}
+
+func (e *CommandReference) String() string {
+	var s string
+	s += fmt.Sprintf("[commandreference '%v' %v]", e.commandType, e.commandTypeID)
+
+	return s
 }

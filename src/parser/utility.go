@@ -45,16 +45,16 @@ func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	return name, fields, nil
 }
 
-func (p *Parser) parseNameAndFieldsAndEvents() (string, []*definition.Field, []*definition.EventReference, error) {
+func (p *Parser) parseNameAndFieldsAndReferences() (string, []*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
 	name, nameErr := p.parseNameAndStartScope()
 	if nameErr != nil {
-		return "", nil, nil, nameErr
+		return "", nil, nil, nil, nameErr
 	}
-	fields, eventReferences, fieldsErr := p.parseFieldsAndEventsUntilEndScope()
+	fields, eventReferences, commandReferences, fieldsErr := p.parseFieldsAndEventsUntilEndScope()
 	if fieldsErr != nil {
-		return "", nil, nil, fieldsErr
+		return "", nil, nil, nil, fieldsErr
 	}
-	return name, fields, eventReferences, nil
+	return name, fields, eventReferences, commandReferences, nil
 }
 
 func (p *Parser) parseNameAndStartScope() (string, error) {
@@ -96,40 +96,47 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 	return nil, nil
 }
 
-func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*definition.EventReference, error) {
+func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
 	var fields []*definition.Field
 	var events []*definition.EventReference
+	var commands []*definition.CommandReference
 
 	for true {
 		t, tokenErr := p.readNext()
 		if tokenErr != nil {
-			return nil, nil, tokenErr
+			return nil, nil, nil, tokenErr
 		}
 		symbolToken, wasSymbol := t.(token.SymbolToken)
 		if !wasSymbol {
 			_, wasEndScope := t.(token.EndScopeToken)
 			if wasEndScope {
-				return fields, events, nil
+				return fields, events, commands, nil
 			}
-			return nil, nil, fmt.Errorf("Expected fieldname, event or end of scope")
+			return nil, nil, nil, fmt.Errorf("Expected fieldname, event or end of scope")
 		}
 
 		isEvent := (symbolToken.Symbol == "event")
+		isCommand := (symbolToken.Symbol == "command")
 
 		if isEvent {
-			fmt.Printf("Found EVENT:%v\n", symbolToken)
 			parsedEventReference, parsedEventErr := p.parseEventReference()
 			if parsedEventErr != nil {
-				return nil, nil, parsedEventErr
+				return nil, nil, nil, parsedEventErr
 			}
 			events = append(events, parsedEventReference)
+		} else if isCommand {
+			parsedCommandReference, parsedCommandErr := p.parseCommandReference()
+			if parsedCommandErr != nil {
+				return nil, nil, nil, parsedCommandErr
+			}
+			commands = append(commands, parsedCommandReference)
 		} else {
 			parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
 			if parseFieldErr != nil {
-				return nil, nil, parseFieldErr
+				return nil, nil, nil, parseFieldErr
 			}
 			fields = append(fields, parsedField)
 		}
 	}
-	return nil, nil, nil
+	return nil, nil, nil, nil
 }

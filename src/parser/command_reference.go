@@ -28,11 +28,23 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseComponent() (*definition.Component, error) {
-	name, fields, eventReferences, commandReferences, err := p.parseNameAndFieldsAndReferences()
-	if err != nil {
-		return nil, err
+func (p *Parser) parseCommandReference() (*definition.CommandReference, error) {
+	/*
+		name, symbolErr := p.parseSymbol()
+		if symbolErr != nil {
+			return nil, symbolErr
+		}
+	*/
+	commandTypeName, commandTypeNameErr := p.parseSymbol()
+	if commandTypeNameErr != nil {
+		return nil, commandTypeNameErr
 	}
-	component := definition.NewComponent(name, fields, eventReferences, commandReferences)
-	return component, nil
+
+	hopefullyLineDelimiterErr := p.expectLineDelimiter()
+	if hopefullyLineDelimiterErr != nil {
+		return nil, hopefullyLineDelimiterErr
+	}
+
+	eventReference := definition.NewCommandReference(commandTypeName)
+	return eventReference, nil
 }
