@@ -106,7 +106,7 @@ func (p *Parser) next() (bool, error) {
 			}
 			p.root.AddEvent(event)
 		case "command":
-			method, err := p.parseCommand()
+			method, err := p.parseCommand(definition.NewCommandTypeIndex(len(p.root.Commands())))
 			if err != nil {
 				return false, err
 			}

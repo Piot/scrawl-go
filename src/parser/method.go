@@ -60,11 +60,11 @@ func (p *Parser) parseCommandNameParameterAndReturn() (string, string, string, e
 	return name, parameter, returnType, nil
 }
 
-func (p *Parser) parseCommand() (*definition.Command, error) {
+func (p *Parser) parseCommand(index definition.CommandTypeIndex) (*definition.Command, error) {
 	name, parameter, returnType, err := p.parseCommandNameParameterAndReturn()
 	if err != nil {
 		return nil, err
 	}
-	method := definition.NewCommand(name, parameter, returnType)
+	method := definition.NewCommand(index, name, parameter, returnType)
 	return method, nil
 }

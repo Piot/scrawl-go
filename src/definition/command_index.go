@@ -30,32 +30,19 @@ import (
 	"fmt"
 )
 
-type Command struct {
-	name       string
-	parameter  string
-	returnType string
-	index      CommandTypeIndex
+// CommandTypeIndex :
+type CommandTypeIndex struct {
+	id uint8
 }
 
-func NewCommand(index CommandTypeIndex, name string, parameter string, returnType string) *Command {
-	return &Command{index: index, name: name, parameter: parameter, returnType: returnType}
+func (e CommandTypeIndex) Value() uint8 {
+	return e.id
 }
 
-func (c *Command) TypeIndex() CommandTypeIndex {
-	return c.index
-}
-func (c *Command) Name() string {
-	return c.name
+func (e CommandTypeIndex) String() string {
+	return fmt.Sprintf("[command-type-index %v]", e.id)
 }
 
-func (c *Command) ReturnTypeName() string {
-	return c.returnType
-}
-
-func (c *Command) ParameterTypeName() string {
-	return c.parameter
-}
-
-func (c *Command) String() string {
-	return fmt.Sprintf("[command %d:'%v'(%v) %v]", c.index, c.name, c.parameter, c.returnType)
+func NewCommandTypeIndex(index int) CommandTypeIndex {
+	return CommandTypeIndex{id: uint8(index)}
 }
