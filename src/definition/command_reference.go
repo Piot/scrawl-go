@@ -28,14 +28,18 @@ package definition
 
 import "fmt"
 
+type CommandReferenceIndex uint8
+
 type CommandReference struct {
 	commandType   string
 	commandTypeID EntityTypeID
+	index         CommandReferenceIndex
 }
 
-func NewCommandReference(CommandType string) *CommandReference {
+func NewCommandReference(index CommandReferenceIndex, CommandType string) *CommandReference {
 	return &CommandReference{
 		commandTypeID: NewEntityTypeIDFromString(CommandType),
+		index:         index,
 		commandType:   CommandType}
 }
 
@@ -45,6 +49,10 @@ func (e *CommandReference) ReferencedType() string {
 
 func (c *CommandReference) ID() EntityTypeID {
 	return c.commandTypeID
+}
+
+func (c *CommandReference) ReferenceIndex() CommandReferenceIndex {
+	return c.index
 }
 
 func (e *CommandReference) String() string {

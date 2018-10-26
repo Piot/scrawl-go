@@ -119,13 +119,15 @@ func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*de
 		isCommand := (symbolToken.Symbol == "command")
 
 		if isEvent {
-			parsedEventReference, parsedEventErr := p.parseEventReference()
+			eventReferenceIndexValue := definition.EventReferenceIndex(len(events))
+			parsedEventReference, parsedEventErr := p.parseEventReference(eventReferenceIndexValue)
 			if parsedEventErr != nil {
 				return nil, nil, nil, parsedEventErr
 			}
 			events = append(events, parsedEventReference)
 		} else if isCommand {
-			parsedCommandReference, parsedCommandErr := p.parseCommandReference()
+			commandReferenceIndexValue := definition.CommandReferenceIndex(len(commands))
+			parsedCommandReference, parsedCommandErr := p.parseCommandReference(commandReferenceIndexValue)
 			if parsedCommandErr != nil {
 				return nil, nil, nil, parsedCommandErr
 			}

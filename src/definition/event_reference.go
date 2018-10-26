@@ -28,14 +28,18 @@ package definition
 
 import "fmt"
 
+type EventReferenceIndex uint8
+
 type EventReference struct {
 	eventType   string
 	eventTypeID EntityTypeID
+	index       EventReferenceIndex
 }
 
-func NewEventReference(eventType string) *EventReference {
+func NewEventReference(index EventReferenceIndex, eventType string) *EventReference {
 	return &EventReference{
 		eventTypeID: NewEntityTypeIDFromString(eventType),
+		index:       index,
 		eventType:   eventType}
 }
 
@@ -45,6 +49,10 @@ func (e *EventReference) ReferencedType() string {
 
 func (c *EventReference) ID() EntityTypeID {
 	return c.eventTypeID
+}
+
+func (c *EventReference) ReferenceIndex() EventReferenceIndex {
+	return c.index
 }
 
 func (e *EventReference) String() string {

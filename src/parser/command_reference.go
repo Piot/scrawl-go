@@ -28,7 +28,7 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseCommandReference() (*definition.CommandReference, error) {
+func (p *Parser) parseCommandReference(index definition.CommandReferenceIndex) (*definition.CommandReference, error) {
 	/*
 		name, symbolErr := p.parseSymbol()
 		if symbolErr != nil {
@@ -45,6 +45,6 @@ func (p *Parser) parseCommandReference() (*definition.CommandReference, error) {
 		return nil, hopefullyLineDelimiterErr
 	}
 
-	eventReference := definition.NewCommandReference(commandTypeName)
-	return eventReference, nil
+	commandReference := definition.NewCommandReference(index, commandTypeName)
+	return commandReference, nil
 }
