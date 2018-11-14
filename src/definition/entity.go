@@ -26,21 +26,27 @@ SOFTWARE.
 
 package definition
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
-type Entity struct {
-	name            string
-	entityTypeID    EntityTypeID
+type EntityLod struct {
+	lodLevel        int
 	componentFields []*ComponentField
 }
 
-func NewEntity(name string, componentFields []*ComponentField) *Entity {
-	return &Entity{name: name, entityTypeID: NewEntityTypeIDFromString(name), componentFields: componentFields}
+func (c *EntityLod) Component(index int) *ComponentField {
+	return c.componentFields[index]
 }
 
-func (c *Entity) String() string {
+func (c *EntityLod) Components() []*ComponentField {
+	return c.componentFields
+}
+
+func (c *EntityLod) String() string {
 	var s string
-	s += fmt.Sprintf("[entity '%v' components:%d\n", c.name, len(c.componentFields))
+	s += fmt.Sprintf("[lod%d components:%d\n", c.lodLevel, len(c.componentFields))
 	for _, field := range c.componentFields {
 		s += "  " + field.String() + "\n"
 	}
@@ -48,18 +54,57 @@ func (c *Entity) String() string {
 	return s
 }
 
+func NewEntityLod(lodLevel int, componentFields []*ComponentField) *EntityLod {
+	return &EntityLod{lodLevel: lodLevel, componentFields: componentFields}
+}
+
+type Entity struct {
+	name         string
+	entityTypeID EntityTypeID
+	lods         map[int]*EntityLod
+}
+
+func NewEntity(name string, componentFields []*ComponentField) *Entity {
+	lods := make(map[int]*EntityLod, 1)
+	lods[0] = NewEntityLod(0, componentFields)
+	return &Entity{name: name, entityTypeID: NewEntityTypeIDFromString(name), lods: lods}
+}
+
+func (c *Entity) String() string {
+	var s string
+	s += fmt.Sprintf("[entity '%v' lodLevels:%d\n", c.name, len(c.lods))
+
+	keys := make([]int, 0, len(c.lods))
+	for k := range c.lods {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	for _, key := range keys {
+		lod := c.lods[key]
+		s += lod.String()
+	}
+
+	return s
+}
+
 func (c *Entity) Name() string {
 	return c.name
+}
+
+func (c *Entity) NewLod(lodLevel int, componentFields []*ComponentField) (*EntityLod, error) {
+	_, doesExist := c.lods[lodLevel]
+	if doesExist {
+		return nil, fmt.Errorf("lod level %d already exists", lodLevel)
+	}
+	lod := NewEntityLod(lodLevel, componentFields)
+	c.lods[lodLevel] = lod
+	return lod, nil
 }
 
 func (c *Entity) ID() EntityTypeID {
 	return c.entityTypeID
 }
 
-func (c *Entity) Component(index int) *ComponentField {
-	return c.componentFields[index]
-}
-
-func (c *Entity) Components() []*ComponentField {
-	return c.componentFields
+func (c *Entity) HighestLevelOfDetail() *EntityLod {
+	return c.lods[0]
 }

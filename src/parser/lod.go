@@ -24,28 +24,19 @@ SOFTWARE.
 
 */
 
-package tokenize
+package parser
 
-import (
-	"strconv"
+import "github.com/piot/scrawl-go/src/definition"
 
-	"github.com/piot/scrawl-go/src/token"
-)
-
-func (t *Tokenizer) parseNumber() (token.Token, error) {
-	var a string
-	startPosition := t.position
-	for true {
-		ch := t.nextRune()
-		if !isDigit(ch) {
-			t.unreadRune()
-			break
-		}
-		a += string(ch)
+func (p *Parser) parseLod(lastEntity *definition.Entity) (*definition.EntityLod, error) {
+	lodLevel, fields, err := p.parseIntegerAndFields()
+	if err != nil {
+		return nil, err
 	}
-	v, vErr := strconv.Atoi(a)
-	if vErr != nil {
-		return nil, vErr
+	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields)
+	if componentFieldsErr != nil {
+		return nil, componentFieldsErr
 	}
-	return token.NewNumberToken(float64(v), startPosition), nil
+
+	return lastEntity.NewLod(lodLevel, componentFields)
 }

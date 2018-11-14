@@ -44,6 +44,10 @@ func (s NumberToken) Position() Position {
 	return s.position
 }
 
+func (s NumberToken) Integer() int {
+	return int(s.number)
+}
+
 func (s NumberToken) String() string {
 	return fmt.Sprintf("Number:%f", s.number)
 }

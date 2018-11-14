@@ -26,7 +26,11 @@ SOFTWARE.
 
 package parser
 
-import "github.com/piot/scrawl-go/src/definition"
+import (
+	"fmt"
+
+	"github.com/piot/scrawl-go/src/definition"
+)
 
 func (p *Parser) parseCommandReference(index definition.CommandReferenceIndex) (*definition.CommandReference, error) {
 	/*
@@ -42,7 +46,7 @@ func (p *Parser) parseCommandReference(index definition.CommandReferenceIndex) (
 
 	hopefullyLineDelimiterErr := p.expectLineDelimiter()
 	if hopefullyLineDelimiterErr != nil {
-		return nil, hopefullyLineDelimiterErr
+		return nil, fmt.Errorf("command reference:%v", hopefullyLineDelimiterErr)
 	}
 
 	commandReference := definition.NewCommandReference(index, commandTypeName)

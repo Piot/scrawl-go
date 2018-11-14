@@ -33,11 +33,9 @@ func (p *Parser) parseEntity() (*definition.Entity, error) {
 	if err != nil {
 		return nil, err
 	}
-	var componentFields []*definition.ComponentField
-	for _, fieldComponent := range fields {
-		componentType := p.root.FindComponent(fieldComponent.FieldType())
-		componentField := definition.NewComponentField(len(componentFields), fieldComponent.Name(), componentType)
-		componentFields = append(componentFields, componentField)
+	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields)
+	if componentFieldsErr != nil {
+		return nil, componentFieldsErr
 	}
 	entity := definition.NewEntity(name, componentFields)
 	return entity, nil

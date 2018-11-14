@@ -2,6 +2,9 @@ type Strength
   big int
   small int
 
+type MinimalStrength
+  strength int
+
 type Attack
   strength Strength
   time int
@@ -10,5 +13,25 @@ type AttackResult
   stillWorking bool
 
 component Tough
-  command attack Attack AttackResult
-  
+  strength Strength
+  command AttackCmd
+
+component SimplePosition
+  x int
+  y int
+  z int
+
+component SimpleAnimation
+  state int
+
+command AttackCmd Attack AttackResult
+
+entity Creature
+  toughness Tough
+
+lod 1
+  position SimplePosition
+  animation SimpleAnimation
+
+lod 2
+  position SimplePosition

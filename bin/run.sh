@@ -1,3 +1,4 @@
 go build -o scrawl-verify ../src/main.go
-./scrawl-verify protocol.txt
+./scrawl-verify -verbose protocol.txt
+
 

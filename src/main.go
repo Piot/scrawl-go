@@ -32,31 +32,43 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/piot/scrawl-go/src/definition"
 	"github.com/piot/scrawl-go/src/scrawl"
 )
 
-func parseOptions() string {
+func parseOptions() (string, bool) {
 	var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	protocolDefinitionFilename := commandLine.String("protocol", "protocol.txt", "Protocol definition")
 	var flagForceColor = commandLine.Bool("color", false, "Enable color output")
+	var flagVerbose = commandLine.Bool("verbose", false, "Verbose")
 
 	commandLine.Parse(os.Args[1:])
 	if *flagForceColor {
 		color.NoColor = false
 	}
-	return *protocolDefinitionFilename
+	return *protocolDefinitionFilename, *flagVerbose
+}
+
+func printRoot(root *definition.Root) {
+	fmt.Printf("--- Summary ---\n")
+	for _, entity := range root.Entities() {
+		fmt.Printf("%v\n", entity)
+	}
 }
 
 func run() error {
-	protocolDefinitionFilename := parseOptions()
+	protocolDefinitionFilename, verbose := parseOptions()
 	if protocolDefinitionFilename == "" {
 		return fmt.Errorf("Must specify a protocol file")
 	}
-	_, rootErr := scrawl.ParseFile(protocolDefinitionFilename)
+	root, rootErr := scrawl.ParseFile(protocolDefinitionFilename)
 	if rootErr != nil {
 		return rootErr
 	}
 
+	if verbose {
+		printRoot(root)
+	}
 	return nil
 }
 
@@ -64,7 +76,7 @@ func main() {
 	color.New(color.FgCyan).Fprintf(os.Stderr, "scrawl protocol validator 0.2\n")
 	err := run()
 	if err != nil {
-		color.New(color.FgRed).Fprintf(os.Stderr, "Validation Error: %v", err)
+		color.New(color.FgRed).Fprintf(os.Stderr, "Validation Error: %v\n", err)
 	} else {
 		color.Green("Validation passed")
 	}

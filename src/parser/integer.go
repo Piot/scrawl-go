@@ -24,28 +24,23 @@ SOFTWARE.
 
 */
 
-package tokenize
+package parser
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/piot/scrawl-go/src/token"
 )
 
-func (t *Tokenizer) parseNumber() (token.Token, error) {
-	var a string
-	startPosition := t.position
-	for true {
-		ch := t.nextRune()
-		if !isDigit(ch) {
-			t.unreadRune()
-			break
-		}
-		a += string(ch)
+func (p *Parser) parseInteger() (int, error) {
+	t, tokenErr := p.readNext()
+	if tokenErr != nil {
+		return 0, tokenErr
 	}
-	v, vErr := strconv.Atoi(a)
-	if vErr != nil {
-		return nil, vErr
+	numberToken, wasNumber := t.(token.NumberToken)
+	if !wasNumber {
+		return 0, fmt.Errorf("Wasn't a number")
 	}
-	return token.NewNumberToken(float64(v), startPosition), nil
+
+	return numberToken.Integer(), nil
 }

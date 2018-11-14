@@ -57,6 +57,31 @@ func (p *Parser) parseNameAndFieldsAndReferences() (string, []*definition.Field,
 	return name, fields, eventReferences, commandReferences, nil
 }
 
+func (p *Parser) parseIntegerAndFields() (int, []*definition.Field, error) {
+	name, nameErr := p.parseIntegerAndStartScope()
+	if nameErr != nil {
+		return 0, nil, nameErr
+	}
+	fields, fieldsErr := p.parseFieldsUntilEndScope()
+	if fieldsErr != nil {
+		return 0, nil, fieldsErr
+	}
+	return name, fields, nil
+}
+
+func (p *Parser) parseIntegerAndStartScope() (int, error) {
+	number, symbolErr := p.parseInteger()
+	if symbolErr != nil {
+		return 0, symbolErr
+	}
+	startScopeErr := p.parseStartScope()
+	if startScopeErr != nil {
+		return 0, startScopeErr
+	}
+
+	return number, nil
+}
+
 func (p *Parser) parseNameAndStartScope() (string, error) {
 	name, symbolErr := p.parseSymbol()
 	if symbolErr != nil {

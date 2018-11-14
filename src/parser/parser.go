@@ -55,9 +55,10 @@ func (f ParserError) Error() string {
 }
 
 type Parser struct {
-	tokenizer *tokenize.Tokenizer
-	root      *definition.Root
-	lastToken token.Token
+	tokenizer  *tokenize.Tokenizer
+	root       *definition.Root
+	lastToken  token.Token
+	lastEntity *definition.Entity
 }
 
 func (p *Parser) readNext() (token.Token, error) {
@@ -92,12 +93,18 @@ func (p *Parser) next() (bool, error) {
 				return false, err
 			}
 			p.root.AddUserType(userType)
+		case "lod":
+			_, err := p.parseLod(p.lastEntity)
+			if err != nil {
+				return false, err
+			}
 		case "entity":
 			entity, err := p.parseEntity()
 			if err != nil {
 				return false, err
 			}
 			p.root.AddEntity(entity)
+			p.lastEntity = entity
 		case "event":
 			event, err := p.parseEvent()
 			if err != nil {
