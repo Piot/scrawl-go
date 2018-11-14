@@ -108,3 +108,7 @@ func (c *Entity) ID() EntityTypeID {
 func (c *Entity) HighestLevelOfDetail() *EntityLod {
 	return c.lods[0]
 }
+
+func (c *Entity) Lod(lodLevel int) *EntityLod {
+	return c.lods[lodLevel]
+}
