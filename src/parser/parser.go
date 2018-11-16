@@ -99,7 +99,9 @@ func (p *Parser) next() (bool, error) {
 				return false, err
 			}
 		case "entity":
-			entity, err := p.parseEntity()
+			index := uint8(len(p.root.Entities()))
+			entityIndex := definition.NewEntityIndex(index)
+			entity, err := p.parseEntity(entityIndex)
 			if err != nil {
 				return false, err
 			}

@@ -28,7 +28,7 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseEntity() (*definition.Entity, error) {
+func (p *Parser) parseEntity(entityIndex definition.EntityIndex) (*definition.Entity, error) {
 	name, fields, err := p.parseNameAndFields()
 	if err != nil {
 		return nil, err
@@ -37,6 +37,6 @@ func (p *Parser) parseEntity() (*definition.Entity, error) {
 	if componentFieldsErr != nil {
 		return nil, componentFieldsErr
 	}
-	entity := definition.NewEntity(name, componentFields)
+	entity := definition.NewEntity(name, entityIndex, componentFields)
 	return entity, nil
 }

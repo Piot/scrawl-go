@@ -61,13 +61,14 @@ func NewEntityLod(lodLevel int, componentFields []*ComponentField) *EntityLod {
 type Entity struct {
 	name         string
 	entityTypeID EntityTypeID
+	index        EntityIndex
 	lods         map[int]*EntityLod
 }
 
-func NewEntity(name string, componentFields []*ComponentField) *Entity {
+func NewEntity(name string, index EntityIndex, componentFields []*ComponentField) *Entity {
 	lods := make(map[int]*EntityLod, 1)
 	lods[0] = NewEntityLod(0, componentFields)
-	return &Entity{name: name, entityTypeID: NewEntityTypeIDFromString(name), lods: lods}
+	return &Entity{name: name, index: index, entityTypeID: NewEntityTypeIDFromString(name), lods: lods}
 }
 
 func (c *Entity) String() string {
@@ -103,6 +104,10 @@ func (c *Entity) NewLod(lodLevel int, componentFields []*ComponentField) (*Entit
 
 func (c *Entity) ID() EntityTypeID {
 	return c.entityTypeID
+}
+
+func (c *Entity) Index() EntityIndex {
+	return c.index
 }
 
 func (c *Entity) HighestLevelOfDetail() *EntityLod {

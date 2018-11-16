@@ -44,7 +44,7 @@ func WriteCSharp(root *definition.Root) {
 
 	for _, entity := range root.Entities() {
 		fmt.Printf("public class %s\n{\n", entity.Name())
-		for _, field := range entity.Components() {
+		for _, field := range entity.HighestLevelOfDetail().Components() {
 			fmt.Printf(" public %s %s;\n", field.Component().Name(), field.Name())
 		}
 		fmt.Printf("}\n")

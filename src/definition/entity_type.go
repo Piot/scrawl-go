@@ -31,6 +31,23 @@ import (
 	"hash/fnv"
 )
 
+// EntityIndex :
+type EntityIndex struct {
+	id uint8
+}
+
+func NewEntityIndex(id uint8) EntityIndex {
+	return EntityIndex{id: id}
+}
+
+func (e EntityIndex) Value() uint8 {
+	return e.id
+}
+
+func (e EntityIndex) String() string {
+	return fmt.Sprintf("[entityindex %v]", e.id)
+}
+
 // EntityTypeID :
 type EntityTypeID struct {
 	id uint16
