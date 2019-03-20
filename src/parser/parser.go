@@ -120,6 +120,13 @@ func (p *Parser) next() (bool, error) {
 				return false, err
 			}
 			p.root.AddMethod(method)
+		case "enum":
+			enum, err := p.parseEnum()
+			if err != nil {
+				return false, err
+			}
+			p.root.AddEnum(enum)
+
 		default:
 			return false, fmt.Errorf("Unknown keyword %v", symbolToken)
 		}

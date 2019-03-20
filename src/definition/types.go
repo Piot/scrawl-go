@@ -40,6 +40,7 @@ type Root struct {
 	entities   []*Entity
 	commands   []*Command
 	events     []*Event
+	enums      []*Enum
 }
 
 func (r *Root) FindComponent(name string) *Component {
@@ -87,6 +88,10 @@ func (r *Root) Components() []*Component {
 	return r.components
 }
 
+func (r *Root) Enums() []*Enum {
+	return r.enums
+}
+
 func (r *Root) Events() []*Event {
 	return r.events
 }
@@ -117,4 +122,8 @@ func (r *Root) AddEvent(c *Event) {
 
 func (r *Root) AddMethod(c *Command) {
 	r.commands = append(r.commands, c)
+}
+
+func (r *Root) AddEnum(c *Enum) {
+	r.enums = append(r.enums, c)
 }

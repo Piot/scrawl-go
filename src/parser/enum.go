@@ -27,20 +27,32 @@ SOFTWARE.
 package parser
 
 import (
-	"fmt"
-
-	"github.com/piot/scrawl-go/src/token"
+	"github.com/piot/scrawl-go/src/definition"
 )
 
-func (p *Parser) parseSymbol() (string, error) {
-	t, tokenErr := p.readNext()
-	if tokenErr != nil {
-		return "", tokenErr
+func (p *Parser) parseEnumNameAndStartScope() (string, error) {
+	name, symbolErr := p.parseSymbol()
+	if symbolErr != nil {
+		return "", symbolErr
 	}
-	symbolToken, wasSymbol := t.(token.SymbolToken)
-	if !wasSymbol {
-		return "", fmt.Errorf("Wasn't a symbol %v", t)
+	scopeErr := p.parseStartScope()
+	if scopeErr != nil {
+		return "", scopeErr
 	}
 
-	return symbolToken.Symbol, nil
+	return name, nil
+}
+
+func (p *Parser) parseEnum() (*definition.Enum, error) {
+	name, err := p.parseEnumNameAndStartScope()
+	if err != nil {
+		return nil, err
+	}
+
+	enumConstants, enumConstantsErr := p.parseEnumConstantsUntilEndScope()
+	if enumConstantsErr != nil {
+		return nil, enumConstantsErr
+	}
+	enum := definition.NewEnum(name, enumConstants)
+	return enum, nil
 }

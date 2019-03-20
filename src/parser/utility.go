@@ -167,3 +167,40 @@ func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*de
 	}
 	return nil, nil, nil, nil
 }
+
+func (p *Parser) parseEnumConstantsUntilEndScope() ([]*definition.EnumConstant, error) {
+	var fields []*definition.EnumConstant
+
+	for true {
+		t, tokenErr := p.readNext()
+		if tokenErr != nil {
+			return nil, tokenErr
+		}
+		symbolToken, wasSymbol := t.(token.SymbolToken)
+		if !wasSymbol {
+			_, wasEndScope := t.(token.EndScopeToken)
+			if wasEndScope {
+				return fields, nil
+			}
+			return nil, fmt.Errorf("Expected enum name or end of scope %v", t)
+		}
+
+		t, tokenErr = p.readNext()
+		if tokenErr != nil {
+			return nil, tokenErr
+		}
+		numberToken, wasNumber := t.(token.NumberToken)
+		if !wasNumber {
+			return nil, fmt.Errorf("Expected enum constant value")
+		}
+		hopefullyLineDelimiterErr := p.expectLineDelimiter()
+		if hopefullyLineDelimiterErr != nil {
+			return nil, fmt.Errorf("enum constants:%v", hopefullyLineDelimiterErr)
+		}
+
+		index := len(fields)
+		enumConstant := definition.NewEnumConstant(index, symbolToken.Symbol, numberToken.Integer(), nil)
+		fields = append(fields, enumConstant)
+	}
+	return nil, nil
+}

@@ -24,23 +24,33 @@ SOFTWARE.
 
 */
 
-package parser
+package definition
 
-import (
-	"fmt"
+import "fmt"
 
-	"github.com/piot/scrawl-go/src/token"
-)
+type Enum struct {
+	name      string
+	constants []*EnumConstant
+}
 
-func (p *Parser) parseSymbol() (string, error) {
-	t, tokenErr := p.readNext()
-	if tokenErr != nil {
-		return "", tokenErr
+func NewEnum(name string, constants []*EnumConstant) *Enum {
+	return &Enum{name: name, constants: constants}
+}
+
+func (c *Enum) Name() string {
+	return c.name
+}
+
+func (c *Enum) Constants() []*EnumConstant {
+	return c.constants
+}
+
+func (c *Enum) String() string {
+	var s string
+	s += fmt.Sprintf("[enum '%v' constants:%d]\n", c.name, len(c.constants))
+	for _, constant := range c.constants {
+		s += "    " + constant.String() + "\n"
 	}
-	symbolToken, wasSymbol := t.(token.SymbolToken)
-	if !wasSymbol {
-		return "", fmt.Errorf("Wasn't a symbol %v", t)
-	}
 
-	return symbolToken.Symbol, nil
+	return s
 }

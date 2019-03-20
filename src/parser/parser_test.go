@@ -203,3 +203,53 @@ command CommandName SomeType ReturnType
 		t.Errorf("wrong command return %v", cmd)
 	}
 }
+
+func TestEnum(t *testing.T) {
+	parser, err := setup(
+		`
+enum MovementState 
+  Attacking 1
+  Idle 0
+
+component AnotherComponent
+  usingTheType int [range "34-45", debug "hello world"]
+  Name string
+  state MovementState
+`)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	def := parser.Root()
+	if len(def.Enums()) != 1 {
+		t.Errorf("Wrong number of enums:%v", len(def.Enums()))
+	}
+	firstEnum := def.Enums()[0]
+	if firstEnum.Name() != "MovementState" {
+		t.Errorf("wrong enum name")
+	}
+
+	firstConstant := firstEnum.Constants()[0]
+	if firstConstant.Name() != "Attacking" {
+		t.Errorf("wrong constant name")
+	}
+
+	if firstConstant.Value() != 1 {
+		t.Errorf("wrong constant value")
+	}
+	if firstConstant.Index() != 0 {
+		t.Errorf("wrong constant value")
+	}
+	secondConstant := firstEnum.Constants()[1]
+	if secondConstant.Name() != "Idle" {
+		t.Errorf("wrong constant name")
+	}
+
+	if secondConstant.Value() != 0 {
+		t.Errorf("wrong constant value")
+	}
+	if secondConstant.Index() != 1 {
+		t.Errorf("wrong constant value")
+	}
+}
