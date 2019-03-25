@@ -30,17 +30,10 @@ import "fmt"
 
 type ComponentFieldType uint8
 
-const (
-	ComponentReferenceType ComponentFieldType = iota
-	RawReferenceType
-)
-
 type ComponentField struct {
-	index     int
-	name      string
-	component *Component
-	rawType   string
-	fieldType ComponentFieldType
+	index         int
+	name          string
+	componentType *ComponentType
 }
 
 func (c *ComponentField) Index() int {
@@ -50,35 +43,16 @@ func (c *ComponentField) Name() string {
 	return c.name
 }
 
-func (c *ComponentField) Component() *Component {
-	if c.fieldType != ComponentReferenceType {
-		panic("wrong component field type")
-	}
-
-	return c.component
+func (c *ComponentField) Type() *ComponentType {
+	return c.componentType
 }
 
-func (c *ComponentField) HasRawReference() bool {
-	return c.fieldType == RawReferenceType
-}
-
-func (c *ComponentField) RawType() string {
-	if c.fieldType != RawReferenceType {
-		panic("wrong component field type")
-	}
-	return c.rawType
-}
-
-func NewComponentField(index int, name string, component *Component) *ComponentField {
-	return &ComponentField{index: index, fieldType: ComponentReferenceType, name: name, component: component}
-}
-
-func NewComponentFieldRawType(index int, name string, rawType string) *ComponentField {
-	return &ComponentField{index: index, fieldType: RawReferenceType, name: name, rawType: rawType}
+func NewComponentField(index int, name string, componentType *ComponentType) *ComponentField {
+	return &ComponentField{index: index, componentType: componentType, name: name}
 }
 
 func (c *ComponentField) String() string {
 	var s string
-	s += fmt.Sprintf("[componentfield '%v' %s   ]", c.name, c.Component())
+	s += fmt.Sprintf("[componentfield '%v' %s   ]", c.name, c.Type())
 	return s
 }

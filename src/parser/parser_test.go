@@ -262,7 +262,7 @@ component SomeOtherComponent
 
 entity ThisISTheEntity2
   shouldTypeSomething SomeOtherComponent
-  body WorldPosition
+  body WorldPosition [range "0-122"]
 `)
 
 	if err != nil {
@@ -270,8 +270,16 @@ entity ThisISTheEntity2
 	}
 
 	def := parser.Root()
-	raw := def.Entities()[0].HighestLevelOfDetail().Component(1).RawType()
+	secondComponent := def.Entities()[0].HighestLevelOfDetail().Component(1)
+	raw := secondComponent.Type().Name()
+
 	if raw != "WorldPosition" {
-		t.Errorf("Wrong type")
+		t.Errorf("Wrong type %v", raw)
+	}
+
+	meta := secondComponent.Type().FieldReference().MetaData()
+	valueRange := meta.Values["range"]
+	if valueRange != "0-122" {
+		t.Errorf("Wrong meta %v", valueRange)
 	}
 }
