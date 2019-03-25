@@ -28,10 +28,19 @@ package definition
 
 import "fmt"
 
+type ComponentFieldType uint8
+
+const (
+	ComponentReferenceType ComponentFieldType = iota
+	RawReferenceType
+)
+
 type ComponentField struct {
 	index     int
 	name      string
 	component *Component
+	rawType   string
+	fieldType ComponentFieldType
 }
 
 func (c *ComponentField) Index() int {
@@ -42,11 +51,30 @@ func (c *ComponentField) Name() string {
 }
 
 func (c *ComponentField) Component() *Component {
+	if c.fieldType != ComponentReferenceType {
+		panic("wrong component field type")
+	}
+
 	return c.component
 }
 
+func (c *ComponentField) HasRawReference() bool {
+	return c.fieldType == RawReferenceType
+}
+
+func (c *ComponentField) RawType() string {
+	if c.fieldType != RawReferenceType {
+		panic("wrong component field type")
+	}
+	return c.rawType
+}
+
 func NewComponentField(index int, name string, component *Component) *ComponentField {
-	return &ComponentField{index: index, name: name, component: component}
+	return &ComponentField{index: index, fieldType: ComponentReferenceType, name: name, component: component}
+}
+
+func NewComponentFieldRawType(index int, name string, rawType string) *ComponentField {
+	return &ComponentField{index: index, fieldType: RawReferenceType, name: name, rawType: rawType}
 }
 
 func (c *ComponentField) String() string {

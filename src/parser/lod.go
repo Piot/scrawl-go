@@ -28,12 +28,12 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseLod(lastEntity *definition.Entity) (*definition.EntityLod, error) {
+func (p *Parser) parseLod(lastEntity *definition.Entity, validComponentTypes []string) (*definition.EntityLod, error) {
 	lodLevel, fields, err := p.parseIntegerAndFields()
 	if err != nil {
 		return nil, err
 	}
-	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields)
+	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields, validComponentTypes)
 	if componentFieldsErr != nil {
 		return nil, componentFieldsErr
 	}

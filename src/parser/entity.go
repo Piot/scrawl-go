@@ -28,12 +28,12 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseEntity(entityIndex definition.EntityIndex) (*definition.Entity, error) {
+func (p *Parser) parseEntity(entityIndex definition.EntityIndex, validComponentTypes []string) (*definition.Entity, error) {
 	name, fields, err := p.parseNameAndFields()
 	if err != nil {
 		return nil, err
 	}
-	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields)
+	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields, validComponentTypes)
 	if componentFieldsErr != nil {
 		return nil, componentFieldsErr
 	}

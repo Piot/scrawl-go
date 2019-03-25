@@ -55,10 +55,11 @@ func (f ParserError) Error() string {
 }
 
 type Parser struct {
-	tokenizer  *tokenize.Tokenizer
-	root       *definition.Root
-	lastToken  token.Token
-	lastEntity *definition.Entity
+	tokenizer           *tokenize.Tokenizer
+	root                *definition.Root
+	lastToken           token.Token
+	lastEntity          *definition.Entity
+	validComponentTypes []string
 }
 
 func (p *Parser) readNext() (token.Token, error) {
@@ -94,14 +95,14 @@ func (p *Parser) next() (bool, error) {
 			}
 			p.root.AddUserType(userType)
 		case "lod":
-			_, err := p.parseLod(p.lastEntity)
+			_, err := p.parseLod(p.lastEntity, p.validComponentTypes)
 			if err != nil {
 				return false, err
 			}
 		case "entity":
 			index := uint8(len(p.root.Entities()))
 			entityIndex := definition.NewEntityIndex(index)
-			entity, err := p.parseEntity(entityIndex)
+			entity, err := p.parseEntity(entityIndex, p.validComponentTypes)
 			if err != nil {
 				return false, err
 			}
@@ -140,9 +141,9 @@ func (p *Parser) Root() *definition.Root {
 	return p.root
 }
 
-func NewParser(text string) (*Parser, error) {
+func NewParser(text string, allowedComponentTypes []string) (*Parser, error) {
 	tokenizer := setupTokenizer(text)
-	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}}
+	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes}
 	done := false
 	var err error
 	err = nil

@@ -33,17 +33,17 @@ import (
 	"github.com/piot/scrawl-go/src/parser"
 )
 
-func ParseFile(filename string) (*definition.Root, error) {
+func ParseFile(filename string, allowedComponentTypes []string) (*definition.Root, error) {
 	octets, octetsErr := ioutil.ReadFile(filename)
 	if octetsErr != nil {
 		return nil, octetsErr
 	}
 	text := string(octets)
-	return ParseString(text)
+	return ParseString(text, allowedComponentTypes)
 }
 
-func ParseString(text string) (*definition.Root, error) {
-	parser, parserErr := parser.NewParser(text)
+func ParseString(text string, allowedComponentTypes []string) (*definition.Root, error) {
+	parser, parserErr := parser.NewParser(text, allowedComponentTypes)
 	if parserErr != nil {
 		return nil, parserErr
 	}

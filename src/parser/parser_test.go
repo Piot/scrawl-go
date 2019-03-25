@@ -31,7 +31,7 @@ import (
 )
 
 func setup(x string) (*Parser, error) {
-	return NewParser(x)
+	return NewParser(x, []string{"WorldPosition"})
 }
 
 func TestIndentationSymbol(t *testing.T) {
@@ -251,5 +251,27 @@ component AnotherComponent
 	}
 	if secondConstant.Index() != 1 {
 		t.Errorf("wrong constant value")
+	}
+}
+
+func TestTypeInsteadOfComponent(t *testing.T) {
+	parser, err := setup(
+		`
+component SomeOtherComponent
+  something Integer
+
+entity ThisISTheEntity2
+  shouldTypeSomething SomeOtherComponent
+  body WorldPosition
+`)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	def := parser.Root()
+	raw := def.Entities()[0].HighestLevelOfDetail().Component(1).RawType()
+	if raw != "WorldPosition" {
+		t.Errorf("Wrong type")
 	}
 }
