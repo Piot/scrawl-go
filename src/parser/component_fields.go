@@ -25,6 +25,7 @@ func MakeComponentFields(root *definition.Root, fields []*definition.Field, vali
 			if !Contains(validComponentTypes, rawType) {
 				return nil, fmt.Errorf("unknown component type:%v", fieldComponent.FieldType())
 			}
+			fieldComponent.ForceNewIndex(0)
 			componentType = definition.NewComponentTypeUsingField(fieldComponent)
 		} else {
 			componentType = definition.NewComponentTypeUsingComponent(componentReference)

@@ -39,6 +39,10 @@ func NewField(index int, name string, fieldType string, metaData MetaData) *Fiel
 	return &Field{index: index, name: name, fieldType: fieldType, metaData: metaData}
 }
 
+func (c *Field) ForceNewIndex(index int) {
+	c.index = index
+}
+
 func (c *Field) Index() int {
 	return c.index
 }
