@@ -35,6 +35,13 @@ import (
 func (t *Tokenizer) parseNumber() (token.Token, error) {
 	var a string
 	startPosition := t.position
+	start := t.nextRune()
+	negative := false
+	if start == '-' {
+		negative = true
+	} else {
+		t.unreadRune()
+	}
 	for true {
 		ch := t.nextRune()
 		if !isDigit(ch) {
@@ -44,6 +51,9 @@ func (t *Tokenizer) parseNumber() (token.Token, error) {
 		a += string(ch)
 	}
 	v, vErr := strconv.Atoi(a)
+	if negative {
+		v = -v
+	}
 	if vErr != nil {
 		return nil, vErr
 	}

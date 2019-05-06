@@ -133,7 +133,7 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 		if isLetter(r) {
 			t.unreadRune()
 			return t.parseSymbol()
-		} else if isDigit(r) {
+		} else if isDigit(r) || r == '-' {
 			t.unreadRune()
 			return t.parseNumber()
 		} else if isStartString(r) {
