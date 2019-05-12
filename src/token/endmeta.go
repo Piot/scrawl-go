@@ -35,6 +35,15 @@ func NewEndMetaDataToken(position Position) EndMetaDataToken {
 	return EndMetaDataToken{position: position}
 }
 
+func (s EndMetaDataToken) IsEqual(other Token) bool {
+	_, isNumber := other.(EndMetaDataToken)
+	if !isNumber {
+		return false
+	}
+
+	return true
+}
+
 func (s EndMetaDataToken) Position() Position {
 	return s.position
 }

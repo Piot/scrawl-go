@@ -35,6 +35,15 @@ func NewLineDelimiter(position Position) LineDelimiterToken {
 	return LineDelimiterToken{position: position}
 }
 
+func (s LineDelimiterToken) IsEqual(other Token) bool {
+	_, isNumber := other.(LineDelimiterToken)
+	if !isNumber {
+		return false
+	}
+
+	return true
+}
+
 func (s LineDelimiterToken) Position() Position {
 	return s.position
 }

@@ -35,6 +35,15 @@ func NewStartScopeToken(position Position) StartScopeToken {
 	return StartScopeToken{position: position}
 }
 
+func (s StartScopeToken) IsEqual(other Token) bool {
+	_, isNumber := other.(StartScopeToken)
+	if !isNumber {
+		return false
+	}
+
+	return true
+}
+
 func (s StartScopeToken) Position() Position {
 	return s.position
 }

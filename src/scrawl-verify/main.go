@@ -29,24 +29,34 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/piot/scrawl-go/src/beautify"
 	"github.com/piot/scrawl-go/src/definition"
+	"github.com/piot/scrawl-go/src/parser"
 	"github.com/piot/scrawl-go/src/scrawl"
 )
 
-func parseOptions() (string, bool) {
+func parseOptions() (string, bool, bool, string) {
 	var commandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	protocolDefinitionFilename := commandLine.String("protocol", "protocol.txt", "Protocol definition")
 	var flagForceColor = commandLine.Bool("color", false, "Enable color output")
 	var flagVerbose = commandLine.Bool("verbose", false, "Verbose")
+	var flagBeautify = commandLine.Bool("beautify", false, "Beautify, overwrites output file!")
+	var outputFilename string
+	commandLine.StringVar(&outputFilename, "output", "", "file to output to. Default same as protocol")
 
 	commandLine.Parse(os.Args[1:])
 	if *flagForceColor {
 		color.NoColor = false
 	}
-	return *protocolDefinitionFilename, *flagVerbose
+	fmt.Printf("output is %v\n", outputFilename)
+	if outputFilename == "" {
+		outputFilename = *protocolDefinitionFilename
+	}
+	return *protocolDefinitionFilename, *flagVerbose, *flagBeautify, outputFilename
 }
 
 func printRoot(root *definition.Root) {
@@ -56,8 +66,31 @@ func printRoot(root *definition.Root) {
 	}
 }
 
+func beautifyToFile(filename string, output string) error {
+	octets, octetsErr := ioutil.ReadFile(filename)
+	if octetsErr != nil {
+		return octetsErr
+	}
+	text := string(octets)
+	tokenizer := parser.SetupTokenizer(text)
+	tokens, readErr := tokenizer.ReadAll()
+	if readErr != nil {
+		return readErr
+	}
+
+	outputFile, createErr := os.Create(output)
+	if createErr != nil {
+		return createErr
+	}
+	fmt.Printf("created file:%v\n", output)
+	beautify.Write(outputFile, tokens)
+	outputFile.Close()
+	return nil
+}
+
 func run() error {
-	protocolDefinitionFilename, verbose := parseOptions()
+	protocolDefinitionFilename, verbose, shouldBeautify, outputFilename := parseOptions()
+	fmt.Printf("beautify:%v\n", shouldBeautify)
 	if protocolDefinitionFilename == "" {
 		return fmt.Errorf("Must specify a protocol file")
 	}
@@ -68,6 +101,13 @@ func run() error {
 
 	if verbose {
 		printRoot(root)
+	}
+
+	if shouldBeautify {
+		beautifyErr := beautifyToFile(protocolDefinitionFilename, outputFilename)
+		if beautifyErr != nil {
+			return beautifyErr
+		}
 	}
 	return nil
 }

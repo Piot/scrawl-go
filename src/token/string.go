@@ -38,6 +38,15 @@ func NewStringToken(text string, position Position) StringToken {
 	return StringToken{text: text, position: position}
 }
 
+func (s StringToken) IsEqual(other Token) bool {
+	otherNumber, isNumber := other.(StringToken)
+	if !isNumber {
+		return false
+	}
+
+	return otherNumber.text == s.text
+}
+
 func (s StringToken) Position() Position {
 	return s.position
 }

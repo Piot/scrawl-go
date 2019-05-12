@@ -34,7 +34,14 @@ type StartMetaDataToken struct {
 func NewStartMetaDataToken(position Position) StartMetaDataToken {
 	return StartMetaDataToken{position: position}
 }
+func (s StartMetaDataToken) IsEqual(other Token) bool {
+	_, isNumber := other.(StartMetaDataToken)
+	if !isNumber {
+		return false
+	}
 
+	return true
+}
 func (s StartMetaDataToken) Position() Position {
 	return s.position
 }

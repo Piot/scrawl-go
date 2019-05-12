@@ -159,3 +159,19 @@ func (t *Tokenizer) ReadNext() (token.Token, error) {
 	// fmt.Printf("return: %v\n", token)
 	return token, nil
 }
+
+func (t *Tokenizer) ReadAll() ([]token.Token, error) {
+	var tokens []token.Token
+	for {
+		tok, tokErr := t.ReadNext()
+		if tokErr != nil {
+			return nil, tokErr
+		}
+		if tok == nil {
+			break
+		}
+		tokens = append(tokens, tok)
+	}
+
+	return tokens, nil
+}

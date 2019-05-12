@@ -1,4 +1,4 @@
-go build -o scrawl-verify ../src/main.go
-./scrawl-verify -verbose protocol.txt
-
-
+name=scrawl-verify
+rm $name
+go build ../src/$name
+./$name  -beautify  -verbose -protocol protocol.txt -output protocol.out.txt

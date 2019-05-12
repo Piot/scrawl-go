@@ -38,7 +38,7 @@ import (
 	"github.com/piot/scrawl-go/src/tokenize"
 )
 
-func setupTokenizer(text string) *tokenize.Tokenizer {
+func SetupTokenizer(text string) *tokenize.Tokenizer {
 	ioReader := strings.NewReader(text)
 	runeReader := runestream.NewRuneReader(ioReader)
 	tokenizer := tokenize.NewTokenizer(runeReader)
@@ -142,7 +142,7 @@ func (p *Parser) Root() *definition.Root {
 }
 
 func NewParser(text string, allowedComponentTypes []string) (*Parser, error) {
-	tokenizer := setupTokenizer(text)
+	tokenizer := SetupTokenizer(text)
 	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes}
 	done := false
 	var err error

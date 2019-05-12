@@ -35,6 +35,15 @@ func NewEndScopeToken(position Position) EndScopeToken {
 	return EndScopeToken{position: position}
 }
 
+func (s EndScopeToken) IsEqual(other Token) bool {
+	_, isNumber := other.(EndScopeToken)
+	if !isNumber {
+		return false
+	}
+
+	return true
+}
+
 func (s EndScopeToken) Position() Position {
 	return s.position
 }

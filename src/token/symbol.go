@@ -38,6 +38,14 @@ func NewSymbolToken(a string, startPosition Position) SymbolToken {
 	return SymbolToken{Symbol: a, position: startPosition}
 }
 
+func (s SymbolToken) IsEqual(other Token) bool {
+	otherNumber, isNumber := other.(SymbolToken)
+	if !isNumber {
+		return false
+	}
+
+	return otherNumber.Symbol == s.Symbol
+}
 func (s SymbolToken) Position() Position {
 	return s.position
 }

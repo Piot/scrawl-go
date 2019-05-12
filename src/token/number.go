@@ -39,6 +39,14 @@ type NumberToken struct {
 func NewNumberToken(v float64, startPosition Position) NumberToken {
 	return NumberToken{number: v, position: startPosition}
 }
+func (s NumberToken) IsEqual(other Token) bool {
+	otherNumber, isNumber := other.(NumberToken)
+	if !isNumber {
+		return false
+	}
+
+	return otherNumber.number == s.number
+}
 
 func (s NumberToken) Position() Position {
 	return s.position

@@ -29,4 +29,5 @@ package token
 // Token :
 type Token interface {
 	Position() Position
+	IsEqual(t Token) bool
 }
