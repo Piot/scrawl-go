@@ -62,13 +62,26 @@ type Parser struct {
 	validComponentTypes []string
 }
 
-func (p *Parser) readNext() (token.Token, error) {
+func (p *Parser) readNextEvenComments() (token.Token, error) {
 	token, err := p.tokenizer.ReadNext()
 	if err != nil {
 		return nil, err
 	}
 	p.lastToken = token
 	return token, nil
+}
+
+func (p *Parser) readNext() (token.Token, error) {
+	for {
+		foundToken, tokenErr := p.readNextEvenComments()
+		if tokenErr != nil {
+			return nil, tokenErr
+		}
+		_, isComment := foundToken.(token.CommentToken)
+		if !isComment {
+			return foundToken, tokenErr
+		}
+	}
 }
 
 func (p *Parser) next() (bool, error) {

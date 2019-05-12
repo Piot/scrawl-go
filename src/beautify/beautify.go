@@ -22,6 +22,12 @@ func (o *OutputStream) writeString(stringToken token.StringToken) {
 	fmt.Fprintf(o.writer, "'%v'", stringToken.Text())
 	o.col++
 }
+
+func (o *OutputStream) writeComment(commentToken token.CommentToken) {
+	fmt.Fprintf(o.writer, "# %s", commentToken.Text())
+	o.col++
+}
+
 func (o *OutputStream) writeNumber(numberToken token.NumberToken) {
 	fmt.Fprintf(o.writer, "%d", numberToken.Integer())
 	o.col++
@@ -76,6 +82,11 @@ func writeToken(o *OutputStream, tok token.Token) {
 	stringToken, wasString := tok.(token.StringToken)
 	if wasString {
 		o.writeString(stringToken)
+		return
+	}
+	commentToken, wasComment := tok.(token.CommentToken)
+	if wasComment {
+		o.writeComment(commentToken)
 		return
 	}
 	numberToken, wasNumber := tok.(token.NumberToken)

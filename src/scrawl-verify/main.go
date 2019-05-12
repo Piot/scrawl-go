@@ -52,7 +52,6 @@ func parseOptions() (string, bool, bool, string) {
 	if *flagForceColor {
 		color.NoColor = false
 	}
-	fmt.Printf("output is %v\n", outputFilename)
 	if outputFilename == "" {
 		outputFilename = *protocolDefinitionFilename
 	}
@@ -82,7 +81,6 @@ func beautifyToFile(filename string, output string) error {
 	if createErr != nil {
 		return createErr
 	}
-	fmt.Printf("created file:%v\n", output)
 	beautify.Write(outputFile, tokens)
 	outputFile.Close()
 	return nil
@@ -90,7 +88,6 @@ func beautifyToFile(filename string, output string) error {
 
 func run() error {
 	protocolDefinitionFilename, verbose, shouldBeautify, outputFilename := parseOptions()
-	fmt.Printf("beautify:%v\n", shouldBeautify)
 	if protocolDefinitionFilename == "" {
 		return fmt.Errorf("Must specify a protocol file")
 	}

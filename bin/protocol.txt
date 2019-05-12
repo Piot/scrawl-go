@@ -31,8 +31,7 @@ component SimpleAnimation
   state int
 
 
-command AttackCmd Attack AttackResult
-
+command AttackCmd Attack AttackResult # just for attack
 
 
 entity Creature

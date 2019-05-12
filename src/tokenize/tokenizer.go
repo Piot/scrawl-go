@@ -28,6 +28,7 @@ package tokenize
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/piot/scrawl-go/src/runestream"
 	"github.com/piot/scrawl-go/src/token"
@@ -73,6 +74,21 @@ func (t *Tokenizer) nextRune() rune {
 func (t *Tokenizer) unreadRune() {
 	t.r.Unread()
 	t.position = t.oldPosition
+}
+
+func (t *Tokenizer) parseComment() (token.Token, error) {
+	var a string
+	startPosition := t.position
+	for true {
+		ch := t.nextRune()
+		if isNewLine(ch) {
+			t.unreadRune()
+			break
+		}
+		a += string(ch)
+	}
+	a = strings.TrimSpace(a)
+	return token.NewCommentToken(a, startPosition), nil
 }
 
 func (t *Tokenizer) parseString(startStringRune rune) (token.Token, error) {
@@ -144,6 +160,8 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 			return token.NewEndMetaDataToken(t.position), nil
 		} else if r == ',' {
 			return t.internalReadNext()
+		} else if r == '#' {
+			return t.parseComment()
 		} else if r == 0 {
 			return nil, nil
 		}
@@ -156,7 +174,7 @@ func (t *Tokenizer) ReadNext() (token.Token, error) {
 	if err != nil {
 		return nil, TokenizerError{err: err, position: t.position}
 	}
-	// fmt.Printf("return: %v\n", token)
+	//fmt.Printf("return: %v\n", token)
 	return token, nil
 }
 
