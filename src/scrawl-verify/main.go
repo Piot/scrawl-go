@@ -35,8 +35,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/piot/scrawl-go/src/beautify"
 	"github.com/piot/scrawl-go/src/definition"
-	"github.com/piot/scrawl-go/src/parser"
 	"github.com/piot/scrawl-go/src/scrawl"
+	"github.com/piot/scrawl-go/src/tokenize"
 )
 
 func parseOptions() (string, bool, bool, string) {
@@ -60,6 +60,7 @@ func parseOptions() (string, bool, bool, string) {
 
 func printRoot(root *definition.Root) {
 	fmt.Printf("--- Summary ---\n")
+	fmt.Printf("Hash:%04x\n", root.Hash())
 	for _, entity := range root.Entities() {
 		fmt.Printf("%v\n", entity)
 	}
@@ -71,7 +72,7 @@ func beautifyToFile(filename string, output string) error {
 		return octetsErr
 	}
 	text := string(octets)
-	tokenizer := parser.SetupTokenizer(text)
+	tokenizer := tokenize.SetupTokenizer(text)
 	tokens, readErr := tokenizer.ReadAll()
 	if readErr != nil {
 		return readErr
@@ -81,7 +82,7 @@ func beautifyToFile(filename string, output string) error {
 	if createErr != nil {
 		return createErr
 	}
-	beautify.Write(outputFile, tokens)
+	beautify.Write(outputFile, tokens, beautify.Normal)
 	outputFile.Close()
 	return nil
 }

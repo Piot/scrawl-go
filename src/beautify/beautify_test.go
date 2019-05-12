@@ -2,27 +2,22 @@ package beautify
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/piot/scrawl-go/src/parser"
 	"github.com/piot/scrawl-go/src/token"
+	"github.com/piot/scrawl-go/src/tokenize"
 )
 
-func fetchAllTokens(x string) ([]token.Token, error) {
-	t := parser.SetupTokenizer(x)
-	tokens, readErr := t.ReadAll()
-
-	return tokens, readErr
-}
-
 func setupBeautify(x string) ([]token.Token, string, error) {
-	tokens, err := fetchAllTokens(x)
+	tokens, err := tokenize.FetchAllTokens(x)
 	if err != nil {
 		return nil, "", err
 	}
 	builder := &strings.Builder{}
-	Write(builder, tokens)
+	Write(builder, tokens, Normal)
 	output := builder.String()
 	fmt.Printf("output %v\n", output)
 	return tokens, output, nil
@@ -68,12 +63,44 @@ func checkReverse(t *testing.T, test string, expected string) {
 	if expected != beautified {
 		t.Errorf("mismatch. Expected %q but got %q", expected, beautified)
 	}
-	beautifiedTokens, fetchErr := fetchAllTokens(beautified)
+	beautifiedTokens, fetchErr := tokenize.FetchAllTokens(beautified)
 	if fetchErr != nil {
 		t.Error(fetchErr)
 	}
 
 	compareTokensHelper(t, beautifiedTokens, tokens)
+}
+
+func checkReverseEx(t *testing.T, test string) string {
+	tokens, beautified, err := setupBeautify(test)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	beautifiedTokens, fetchErr := tokenize.FetchAllTokens(beautified)
+	if fetchErr != nil {
+		t.Error(fetchErr)
+	}
+
+	compareTokensHelper(t, beautifiedTokens, tokens)
+	return beautified
+}
+
+func checkReverseFile(t *testing.T, filename string) {
+	octets, err := ioutil.ReadFile(filepath.Join("../test/", filename+".test.txt"))
+	if err != nil {
+		t.Error(err)
+	}
+	content := string(octets)
+
+	outFilename := filepath.Join("../test/", filename+".test.out.txt")
+	expectedOctets, readErr := ioutil.ReadFile(outFilename)
+	if readErr != nil {
+		t.Error(readErr)
+	}
+	expected := string(expectedOctets)
+	checkReverse(t, content, expected)
+	//	ioutil.WriteFile(outFilename, []byte(beautified), 0644)
 }
 
 func TestAnything(t *testing.T) {
@@ -102,4 +129,8 @@ Something 3212
 		`Something 3212
   other 3
 `)
+}
+
+func TestAnythingFileReverse(t *testing.T) {
+	checkReverseFile(t, "reverse")
 }

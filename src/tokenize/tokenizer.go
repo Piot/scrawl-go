@@ -54,6 +54,20 @@ func (f TokenizerError) Error() string {
 	return fmt.Sprintf("%v at %v", f.err, f.position)
 }
 
+func SetupTokenizer(text string) *Tokenizer {
+	ioReader := strings.NewReader(text)
+	runeReader := runestream.NewRuneReader(ioReader)
+	tokenizer := NewTokenizer(runeReader)
+	return tokenizer
+}
+
+func FetchAllTokens(x string) ([]token.Token, error) {
+	t := SetupTokenizer(x)
+	tokens, readErr := t.ReadAll()
+
+	return tokens, readErr
+}
+
 // NewTokenizer :
 func NewTokenizer(r *runestream.RuneReader) *Tokenizer {
 	return &Tokenizer{r: r, position: token.NewPositionTopLeft(), lastTokenWasDelimiter: true}

@@ -29,21 +29,14 @@ package parser
 import (
 	"fmt"
 
+	"github.com/piot/scrawl-go/src/beautify"
+
+	"github.com/piot/scrawl-go/src/scrawlhash"
 	"github.com/piot/scrawl-go/src/token"
 
-	"strings"
-
 	"github.com/piot/scrawl-go/src/definition"
-	"github.com/piot/scrawl-go/src/runestream"
 	"github.com/piot/scrawl-go/src/tokenize"
 )
-
-func SetupTokenizer(text string) *tokenize.Tokenizer {
-	ioReader := strings.NewReader(text)
-	runeReader := runestream.NewRuneReader(ioReader)
-	tokenizer := tokenize.NewTokenizer(runeReader)
-	return tokenizer
-}
 
 type ParserError struct {
 	err      error
@@ -85,12 +78,12 @@ func (p *Parser) readNext() (token.Token, error) {
 }
 
 func (p *Parser) next() (bool, error) {
-	t, tokenErr := p.readNext()
+	t, readErr := p.readNext()
+	if readErr != nil {
+		return false, readErr
+	}
 	if t == nil {
 		return true, nil
-	}
-	if tokenErr != nil {
-		return false, tokenErr
 	}
 	symbolToken, wasSymbol := t.(token.SymbolToken)
 	if wasSymbol {
@@ -154,17 +147,39 @@ func (p *Parser) Root() *definition.Root {
 	return p.root
 }
 
+func calculateHash(text string) (uint32, error) {
+	hashTokens, fetchErr := tokenize.FetchAllTokens(text)
+	if fetchErr != nil {
+		return 0, fetchErr
+	}
+	beautified := beautify.Process(hashTokens, beautify.DiscardComments)
+	//fmt.Printf("beautified:\n%s\n", beautified)
+	hashValue := scrawlhash.CalculateHash([]byte(beautified))
+	return hashValue, nil
+}
+
+func setHash(root *definition.Root, text string) error {
+	hashValue, calculateErr := calculateHash(text)
+	if calculateErr != nil {
+		return calculateErr
+	}
+	definitionHash := definition.Hash(hashValue)
+	root.SetHash(definitionHash)
+	return nil
+}
+
 func NewParser(text string, allowedComponentTypes []string) (*Parser, error) {
-	tokenizer := SetupTokenizer(text)
+	tokenizer := tokenize.SetupTokenizer(text)
 	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes}
 	done := false
 	var err error
 	err = nil
+
 	for !done && err == nil {
 		done, err = parser.next()
 	}
-	var parserErr error
 	if err != nil {
+		var parserErr error
 		_, wasTokenizerError := err.(tokenize.TokenizerError)
 		if !wasTokenizerError {
 			if parser.lastToken == nil {
@@ -175,6 +190,14 @@ func NewParser(text string, allowedComponentTypes []string) (*Parser, error) {
 		} else {
 			parserErr = err
 		}
+
+		return nil, parserErr
 	}
-	return parser, parserErr
+
+	hashErr := setHash(parser.root, text)
+	if hashErr != nil {
+		return nil, hashErr
+	}
+
+	return parser, nil
 }

@@ -33,6 +33,7 @@ import (
 type Type struct {
 	name string
 }
+type Hash uint32
 
 type Root struct {
 	components []*Component
@@ -41,6 +42,15 @@ type Root struct {
 	commands   []*Command
 	events     []*Event
 	enums      []*Enum
+	hash       Hash
+}
+
+func (r *Root) SetHash(hash Hash) {
+	r.hash = hash
+}
+
+func (r *Root) Hash() Hash {
+	return r.hash
 }
 
 func (r *Root) FindComponent(name string) *Component {
