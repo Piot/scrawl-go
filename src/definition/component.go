@@ -30,17 +30,22 @@ import "fmt"
 
 type Component struct {
 	name              string
+	index             uint8
 	fields            []*Field
 	eventReferences   []*EventReference
 	commandReferences []*CommandReference
 }
 
-func NewComponent(name string, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *Component {
-	return &Component{name: name, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
+func NewComponent(name string, index uint8, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *Component {
+	return &Component{name: name, index: index, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
 }
 
 func (c *Component) Name() string {
 	return c.name
+}
+
+func (c *Component) Index() uint8 {
+	return c.index
 }
 
 func (c *Component) Fields() []*Field {

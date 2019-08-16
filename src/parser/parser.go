@@ -89,7 +89,8 @@ func (p *Parser) next() (bool, error) {
 	if wasSymbol {
 		switch symbolToken.Symbol {
 		case "component":
-			component, err := p.parseComponent()
+			index := uint8(len(p.root.Components()))
+			component, err := p.parseComponent(index)
 			if err != nil {
 				return false, err
 			}

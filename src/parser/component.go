@@ -28,11 +28,11 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseComponent() (*definition.Component, error) {
+func (p *Parser) parseComponent(index uint8) (*definition.Component, error) {
 	name, fields, eventReferences, commandReferences, err := p.parseNameAndFieldsAndReferences()
 	if err != nil {
 		return nil, err
 	}
-	component := definition.NewComponent(name, fields, eventReferences, commandReferences)
+	component := definition.NewComponent(name, index, fields, eventReferences, commandReferences)
 	return component, nil
 }
