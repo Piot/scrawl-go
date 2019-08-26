@@ -114,6 +114,10 @@ func (r *Root) Entities() []*Entity {
 	return r.entities
 }
 
+func (r *Root) UserTypes() []*UserType {
+	return r.userTypes
+}
+
 func (r *Root) AddComponent(c *Component) {
 	r.components = append(r.components, c)
 }
