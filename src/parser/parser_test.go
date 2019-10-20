@@ -116,8 +116,8 @@ component AnotherComponent
 component SomeOtherComponent
   event Jump
 
-entity ThisISTheEntity2
-  shouldTypeSomething AnotherComponent
+archetype ThisISTheEntity2
+  AnotherComponent
 
 event Jump
   where Position
@@ -260,8 +260,8 @@ func TestTypeInsteadOfComponent(t *testing.T) {
 component SomeOtherComponent
   something Integer
 
-entity ThisISTheEntity2
-  shouldTypeSomething SomeOtherComponent
+archetype ThisISTheEntity2
+  SomeOtherComponent
   body WorldPosition [range "0-122"]
 `)
 
@@ -270,7 +270,7 @@ entity ThisISTheEntity2
 	}
 
 	def := parser.Root()
-	secondComponent := def.Entities()[0].HighestLevelOfDetail().Component(1)
+	secondComponent := def.Archetypes()[0].HighestLevelOfDetail().ComponentDataType(1)
 	raw := secondComponent.Type().Name()
 
 	if raw != "WorldPosition" {

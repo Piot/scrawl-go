@@ -32,13 +32,13 @@ type EventReferenceIndex uint8
 
 type EventReference struct {
 	eventType   string
-	eventTypeID EntityTypeID
+	eventTypeID EntityArchetypeID
 	index       EventReferenceIndex
 }
 
 func NewEventReference(index EventReferenceIndex, eventType string) *EventReference {
 	return &EventReference{
-		eventTypeID: NewEntityTypeIDFromString(eventType),
+		eventTypeID: NewEntityArchetypeIDFromString(eventType),
 		index:       index,
 		eventType:   eventType}
 }
@@ -47,7 +47,7 @@ func (e *EventReference) ReferencedType() string {
 	return e.eventType
 }
 
-func (c *EventReference) ID() EntityTypeID {
+func (c *EventReference) ID() EntityArchetypeID {
 	return c.eventTypeID
 }
 

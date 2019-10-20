@@ -33,6 +33,18 @@ import (
 	"github.com/piot/scrawl-go/src/token"
 )
 
+func (p *Parser) parseNames() (string, []*definition.Field, error) {
+	name, nameErr := p.parseNameAndStartScope()
+	if nameErr != nil {
+		return "", nil, nameErr
+	}
+	fields, fieldsErr := p.parseNamesUntilEndScope()
+	if fieldsErr != nil {
+		return "", nil, fieldsErr
+	}
+	return name, fields, nil
+}
+
 func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	name, nameErr := p.parseNameAndStartScope()
 	if nameErr != nil {
@@ -113,6 +125,32 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 		}
 
 		parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
+		if parseFieldErr != nil {
+			return nil, parseFieldErr
+		}
+		fields = append(fields, parsedField)
+	}
+	return nil, nil
+}
+
+func (p *Parser) parseComponentDataTypesUntilEndScope() ([]*definition.ComponentDataType, error) {
+	var fields []*definition.ComponentDataType
+
+	for true {
+		t, tokenErr := p.readNext()
+		if tokenErr != nil {
+			return nil, tokenErr
+		}
+		symbolToken, wasSymbol := t.(token.SymbolToken)
+		if !wasSymbol {
+			_, wasEndScope := t.(token.EndScopeToken)
+			if wasEndScope {
+				return fields, nil
+			}
+			return nil, fmt.Errorf("Expected fieldname or end of scope")
+		}
+
+		parsedField, parseFieldErr := p.parseComponentDataType(len(fields), symbolToken.Symbol)
 		if parseFieldErr != nil {
 			return nil, parseFieldErr
 		}

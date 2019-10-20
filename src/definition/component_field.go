@@ -33,7 +33,7 @@ type ComponentFieldType uint8
 type ComponentField struct {
 	index         int
 	name          string
-	componentType *ComponentType
+	componentType *ComponentDataType
 }
 
 func (c *ComponentField) Index() int {
@@ -43,11 +43,11 @@ func (c *ComponentField) Name() string {
 	return c.name
 }
 
-func (c *ComponentField) Type() *ComponentType {
+func (c *ComponentField) Type() *ComponentDataType {
 	return c.componentType
 }
 
-func NewComponentField(index int, name string, componentType *ComponentType) *ComponentField {
+func NewComponentField(index int, name string, componentType *ComponentDataType) *ComponentField {
 	return &ComponentField{index: index, componentType: componentType, name: name}
 }
 

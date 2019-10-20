@@ -35,32 +35,32 @@ const (
 	ComponentTypeField
 )
 
-type ComponentType struct {
-	component *Component
+type ComponentDataType struct {
+	component *ComponentDataType
 	field     *Field
 	variant   ComponentTypeVariant
 }
 
-func NewComponentTypeUsingField(field *Field) *ComponentType {
-	return &ComponentType{variant: ComponentTypeField, field: field}
+func NewComponentTypeUsingField(field *Field) *ComponentDataType {
+	return &ComponentDataType{variant: ComponentTypeField, field: field}
 }
 
-func NewComponentTypeUsingComponent(component *Component) *ComponentType {
-	return &ComponentType{variant: ComponentTypeComponentReference, component: component}
+func NewComponentTypeUsingComponent(component *ComponentDataType) *ComponentDataType {
+	return &ComponentDataType{variant: ComponentTypeComponentReference, component: component}
 }
 
-func (c *ComponentType) HasFieldReference() bool {
+func (c *ComponentDataType) HasFieldReference() bool {
 	return c.variant == ComponentTypeField
 }
 
-func (c *ComponentType) FieldReference() *Field {
+func (c *ComponentDataType) FieldReference() *Field {
 	if c.variant != ComponentTypeField {
 		panic("wrong component field type")
 	}
 	return c.field
 }
 
-func (c *ComponentType) Name() string {
+func (c *ComponentDataType) Name() string {
 	switch c.variant {
 	case ComponentTypeComponentReference:
 		return c.component.Name()
@@ -70,15 +70,15 @@ func (c *ComponentType) Name() string {
 	panic("unknown component type")
 }
 
-func (c *ComponentType) HasComponentReference() bool {
+func (c *ComponentDataType) HasComponentReference() bool {
 	return c.variant == ComponentTypeComponentReference
 }
 
-func (c *ComponentType) Component() *Component {
+func (c *ComponentDataType) ComponentDataType() *ComponentDataType {
 	return c.component
 }
 
-func (c *ComponentType) String() string {
+func (c *ComponentDataType) String() string {
 	var s string
 	switch c.variant {
 	case ComponentTypeComponentReference:

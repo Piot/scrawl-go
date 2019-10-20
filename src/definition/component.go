@@ -28,7 +28,7 @@ package definition
 
 import "fmt"
 
-type Component struct {
+type ComponentDataType struct {
 	name              string
 	index             uint8
 	fields            []*Field
@@ -36,31 +36,31 @@ type Component struct {
 	commandReferences []*CommandReference
 }
 
-func NewComponent(name string, index uint8, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *Component {
-	return &Component{name: name, index: index, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
+func NewComponentDataType(name string, index uint8, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *ComponentDataType {
+	return &ComponentDataType{name: name, index: index, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
 }
 
-func (c *Component) Name() string {
+func (c *ComponentDataType) Name() string {
 	return c.name
 }
 
-func (c *Component) Index() uint8 {
+func (c *ComponentDataType) Index() uint8 {
 	return c.index
 }
 
-func (c *Component) Fields() []*Field {
+func (c *ComponentDataType) Fields() []*Field {
 	return c.fields
 }
 
-func (c *Component) EventReferences() []*EventReference {
+func (c *ComponentDataType) EventReferences() []*EventReference {
 	return c.eventReferences
 }
 
-func (c *Component) CommandReferences() []*CommandReference {
+func (c *ComponentDataType) CommandReferences() []*CommandReference {
 	return c.commandReferences
 }
 
-func (c *Component) String() string {
+func (c *ComponentDataType) String() string {
 	var s string
 	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
 	for _, field := range c.fields {

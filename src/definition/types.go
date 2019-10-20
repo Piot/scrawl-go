@@ -36,9 +36,9 @@ type Type struct {
 type Hash uint32
 
 type Root struct {
-	components []*Component
+	components []*ComponentDataType
 	userTypes  []*UserType
-	entities   []*Entity
+	entities   []*EntityArchetype
 	commands   []*Command
 	events     []*Event
 	enums      []*Enum
@@ -53,7 +53,7 @@ func (r *Root) Hash() Hash {
 	return r.hash
 }
 
-func (r *Root) FindComponent(name string) *Component {
+func (r *Root) FindComponent(name string) *ComponentDataType {
 	for _, component := range r.components {
 		if component.Name() == name {
 			return component
@@ -62,7 +62,7 @@ func (r *Root) FindComponent(name string) *Component {
 	return nil
 }
 
-func (r *Root) FindEntity(name string) *Entity {
+func (r *Root) FindEntity(name string) *EntityArchetype {
 	for _, entity := range r.entities {
 		if entity.Name() == name {
 			return entity
@@ -83,9 +83,9 @@ func (r *Root) FindUserType(name string) *UserType {
 func (r *Root) String() string {
 	var s string
 
-	s += fmt.Sprintf("Components: %d\n", len(r.components))
-	s += fmt.Sprintf("Entities: %d\n", len(r.entities))
-	s += fmt.Sprintf("UserTypes: %d\n", len(r.userTypes))
+	s += fmt.Sprintf("ComponentDataType-types: %d\n", len(r.components))
+	s += fmt.Sprintf("Archetypes: %d\n", len(r.entities))
+	s += fmt.Sprintf("User-types: %d\n", len(r.userTypes))
 
 	for _, entity := range r.entities {
 		s += entity.String() + "\n"
@@ -94,7 +94,7 @@ func (r *Root) String() string {
 	return s
 }
 
-func (r *Root) Components() []*Component {
+func (r *Root) Components() []*ComponentDataType {
 	return r.components
 }
 
@@ -110,7 +110,7 @@ func (r *Root) Commands() []*Command {
 	return r.commands
 }
 
-func (r *Root) Entities() []*Entity {
+func (r *Root) Archetypes() []*EntityArchetype {
 	return r.entities
 }
 
@@ -118,7 +118,7 @@ func (r *Root) UserTypes() []*UserType {
 	return r.userTypes
 }
 
-func (r *Root) AddComponent(c *Component) {
+func (r *Root) AddComponent(c *ComponentDataType) {
 	r.components = append(r.components, c)
 }
 
@@ -126,7 +126,7 @@ func (r *Root) AddUserType(c *UserType) {
 	r.userTypes = append(r.userTypes, c)
 }
 
-func (r *Root) AddEntity(c *Entity) {
+func (r *Root) AddEntity(c *EntityArchetype) {
 	r.entities = append(r.entities, c)
 }
 

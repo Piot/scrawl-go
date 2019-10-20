@@ -31,20 +31,20 @@ import (
 	"sort"
 )
 
-type EntityLod struct {
+type EntityArchetypeLOD struct {
 	lodLevel        int
 	componentFields []*ComponentField
 }
 
-func (c *EntityLod) Component(index int) *ComponentField {
+func (c *EntityArchetypeLOD) ComponentDataType(index int) *ComponentField {
 	return c.componentFields[index]
 }
 
-func (c *EntityLod) Components() []*ComponentField {
+func (c *EntityArchetypeLOD) Components() []*ComponentField {
 	return c.componentFields
 }
 
-func (c *EntityLod) String() string {
+func (c *EntityArchetypeLOD) String() string {
 	var s string
 	s += fmt.Sprintf("[lod%d components:%d\n", c.lodLevel, len(c.componentFields))
 	for _, field := range c.componentFields {
@@ -54,24 +54,24 @@ func (c *EntityLod) String() string {
 	return s
 }
 
-func NewEntityLod(lodLevel int, componentFields []*ComponentField) *EntityLod {
-	return &EntityLod{lodLevel: lodLevel, componentFields: componentFields}
+func NewEntityLod(lodLevel int, componentFields []*ComponentField) *EntityArchetypeLOD {
+	return &EntityArchetypeLOD{lodLevel: lodLevel, componentFields: componentFields}
 }
 
-type Entity struct {
+type EntityArchetype struct {
 	name         string
-	entityTypeID EntityTypeID
+	entityTypeID EntityArchetypeID
 	index        EntityIndex
-	lods         map[int]*EntityLod
+	lods         map[int]*EntityArchetypeLOD
 }
 
-func NewEntity(name string, index EntityIndex, componentFields []*ComponentField) *Entity {
-	lods := make(map[int]*EntityLod, 1)
+func NewEntity(name string, index EntityIndex, componentFields []*ComponentField) *EntityArchetype {
+	lods := make(map[int]*EntityArchetypeLOD, 1)
 	lods[0] = NewEntityLod(0, componentFields)
-	return &Entity{name: name, index: index, entityTypeID: NewEntityTypeIDFromString(name), lods: lods}
+	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods}
 }
 
-func (c *Entity) String() string {
+func (c *EntityArchetype) String() string {
 	var s string
 	s += fmt.Sprintf("[entity '%v' lodLevels:%d\n", c.name, len(c.lods))
 
@@ -88,11 +88,11 @@ func (c *Entity) String() string {
 	return s
 }
 
-func (c *Entity) Name() string {
+func (c *EntityArchetype) Name() string {
 	return c.name
 }
 
-func (c *Entity) NewLod(lodLevel int, componentFields []*ComponentField) (*EntityLod, error) {
+func (c *EntityArchetype) NewLod(lodLevel int, componentFields []*ComponentField) (*EntityArchetypeLOD, error) {
 	_, doesExist := c.lods[lodLevel]
 	if doesExist {
 		return nil, fmt.Errorf("lod level %d already exists", lodLevel)
@@ -102,18 +102,18 @@ func (c *Entity) NewLod(lodLevel int, componentFields []*ComponentField) (*Entit
 	return lod, nil
 }
 
-func (c *Entity) ID() EntityTypeID {
+func (c *EntityArchetype) ID() EntityArchetypeID {
 	return c.entityTypeID
 }
 
-func (c *Entity) Index() EntityIndex {
+func (c *EntityArchetype) Index() EntityIndex {
 	return c.index
 }
 
-func (c *Entity) HighestLevelOfDetail() *EntityLod {
+func (c *EntityArchetype) HighestLevelOfDetail() *EntityArchetypeLOD {
 	return c.lods[0]
 }
 
-func (c *Entity) Lod(lodLevel int) *EntityLod {
+func (c *EntityArchetype) Lod(lodLevel int) *EntityArchetypeLOD {
 	return c.lods[lodLevel]
 }

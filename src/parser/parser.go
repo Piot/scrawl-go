@@ -51,7 +51,7 @@ type Parser struct {
 	tokenizer           *tokenize.Tokenizer
 	root                *definition.Root
 	lastToken           token.Token
-	lastEntity          *definition.Entity
+	lastEntity          *definition.EntityArchetype
 	validComponentTypes []string
 }
 
@@ -106,10 +106,10 @@ func (p *Parser) next() (bool, error) {
 			if err != nil {
 				return false, err
 			}
-		case "entity":
-			index := uint8(len(p.root.Entities()))
+		case "archetype":
+			index := uint8(len(p.root.Archetypes()))
 			entityIndex := definition.NewEntityIndex(index)
-			entity, err := p.parseEntity(entityIndex, p.validComponentTypes)
+			entity, err := p.parseEntityArchetype(entityIndex, p.validComponentTypes)
 			if err != nil {
 				return false, err
 			}

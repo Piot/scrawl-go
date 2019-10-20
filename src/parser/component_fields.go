@@ -19,7 +19,7 @@ func MakeComponentFields(root *definition.Root, fields []*definition.Field, vali
 	var componentFields []*definition.ComponentField
 	for _, fieldComponent := range fields {
 		componentReference := root.FindComponent(fieldComponent.FieldType())
-		var componentType *definition.ComponentType
+		var componentType *definition.ComponentDataType
 		if componentReference == nil {
 			rawType := fieldComponent.FieldType()
 			if !Contains(validComponentTypes, rawType) {

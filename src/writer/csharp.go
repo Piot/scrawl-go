@@ -42,10 +42,10 @@ func WriteCSharp(root *definition.Root) {
 		fmt.Printf("}\n")
 	}
 
-	for _, entity := range root.Entities() {
+	for _, entity := range root.Archetypes() {
 		fmt.Printf("public class %s\n{\n", entity.Name())
 		for _, field := range entity.HighestLevelOfDetail().Components() {
-			fmt.Printf(" public %s %s;\n", field.Type().Component().Name(), field.Name())
+			fmt.Printf(" public %s %s;\n", field.Type().ComponentDataType().Name(), field.Name())
 		}
 		fmt.Printf("}\n")
 	}

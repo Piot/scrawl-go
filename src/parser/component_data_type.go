@@ -30,25 +30,25 @@ import (
 	"fmt"
 
 	"github.com/piot/scrawl-go/src/definition"
+	"github.com/piot/scrawl-go/src/token"
 )
 
-func (p *Parser) parseCommandReference(index definition.CommandReferenceIndex) (*definition.CommandReference, error) {
-	/*
-		name, symbolErr := p.parseSymbol()
-		if symbolErr != nil {
-			return nil, symbolErr
-		}
-	*/
-	commandTypeName, commandTypeNameErr := p.parseSymbol()
-	if commandTypeNameErr != nil {
-		return nil, commandTypeNameErr
+func (p *Parser) parseComponentDataType(index int, name string) (*definition.Field, error) {
+	componentDataTypeString, componentDataTypeErr := p.parseSymbol()
+	if componentDataTypeErr != nil {
+		return &definition.Field{}, fmt.Errorf("Expected a componentDataType symbol (%v)", componentDataTypeErr)
 	}
 
-	hopefullyLineDelimiterErr := p.expectLineDelimiter()
+	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
 	if hopefullyLineDelimiterErr != nil {
-		return nil, fmt.Errorf("command reference:%v", hopefullyLineDelimiterErr)
+		return nil, hopefullyLineDelimiterErr
 	}
 
-	commandReference := definition.NewCommandReference(index, commandTypeName)
-	return commandReference, nil
+	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	if !wasEndOfLine {
+		return nil, fmt.Errorf("Must end lines after componentDataType  token:%v", token)
+	}
+
+	componentDataType := definition.NewComponentDataType(index, name, componentDataTypeString)
+	return componentDataType, nil
 }

@@ -28,7 +28,8 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseEntity(entityIndex definition.EntityIndex, validComponentTypes []string) (*definition.Entity, error) {
+func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
+	validComponentTypes []string) (*definition.EntityArchetype, error) {
 	name, fields, err := p.parseNameAndFields()
 	if err != nil {
 		return nil, err
