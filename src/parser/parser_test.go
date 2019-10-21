@@ -176,20 +176,6 @@ command CommandName SomeType ReturnType
 		t.Errorf("Wrong field name:%v", fields[1].FieldType())
 	}
 
-	eventReferences := def.Components()[0].EventReferences()
-	if len(eventReferences) != 1 {
-		t.Errorf("Must have one event reference")
-	}
-
-	firstRef := eventReferences[0]
-	if firstRef.ReferencedType() != "Jump" {
-		t.Errorf("should be Jump")
-	}
-
-	if firstRef.ReferencedType() != "Jump" {
-		t.Errorf("wrong referenced type")
-	}
-
 	cmd := def.Commands()[0]
 	if cmd.Name() != "CommandName" {
 		t.Errorf("wrong command name %v", cmd)
@@ -262,7 +248,8 @@ component SomeOtherComponent
 
 archetype ThisISTheEntity2
   SomeOtherComponent
-  body WorldPosition [range "0-122"]
+  WorldPosition [range "0-122"]
+
 `)
 
 	if err != nil {
@@ -270,16 +257,12 @@ archetype ThisISTheEntity2
 	}
 
 	def := parser.Root()
-	secondComponent := def.Archetypes()[0].HighestLevelOfDetail().ComponentDataType(1)
-	raw := secondComponent.Type().Name()
+	archetypeToTest := def.Archetypes()[0].HighestLevelOfDetail()
+	secondComponentData := archetypeToTest.ComponentDataType(1)
+	raw := secondComponentData.Name()
 
 	if raw != "WorldPosition" {
 		t.Errorf("Wrong type %v", raw)
 	}
 
-	meta := secondComponent.Type().FieldReference().MetaData()
-	valueRange := meta.Values["range"]
-	if valueRange != "0-122" {
-		t.Errorf("Wrong meta %v", valueRange)
-	}
 }

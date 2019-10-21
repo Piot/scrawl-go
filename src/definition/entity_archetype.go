@@ -31,33 +31,6 @@ import (
 	"sort"
 )
 
-type EntityArchetypeLOD struct {
-	lodLevel        int
-	componentFields []*ComponentField
-}
-
-func (c *EntityArchetypeLOD) ComponentDataType(index int) *ComponentField {
-	return c.componentFields[index]
-}
-
-func (c *EntityArchetypeLOD) Components() []*ComponentField {
-	return c.componentFields
-}
-
-func (c *EntityArchetypeLOD) String() string {
-	var s string
-	s += fmt.Sprintf("[lod%d components:%d\n", c.lodLevel, len(c.componentFields))
-	for _, field := range c.componentFields {
-		s += "  " + field.String() + "\n"
-	}
-	s += "]"
-	return s
-}
-
-func NewEntityLod(lodLevel int, componentFields []*ComponentField) *EntityArchetypeLOD {
-	return &EntityArchetypeLOD{lodLevel: lodLevel, componentFields: componentFields}
-}
-
 type EntityArchetype struct {
 	name         string
 	entityTypeID EntityArchetypeID
@@ -65,9 +38,9 @@ type EntityArchetype struct {
 	lods         map[int]*EntityArchetypeLOD
 }
 
-func NewEntity(name string, index EntityIndex, componentFields []*ComponentField) *EntityArchetype {
+func NewEntityArchetype(name string, index EntityIndex, items []*EntityArchetypeItem) *EntityArchetype {
 	lods := make(map[int]*EntityArchetypeLOD, 1)
-	lods[0] = NewEntityLod(0, componentFields)
+	lods[0] = NewEntityLod(0, items)
 	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods}
 }
 
@@ -92,12 +65,12 @@ func (c *EntityArchetype) Name() string {
 	return c.name
 }
 
-func (c *EntityArchetype) NewLod(lodLevel int, componentFields []*ComponentField) (*EntityArchetypeLOD, error) {
+func (c *EntityArchetype) NewLod(lodLevel int, items []*EntityArchetypeItem) (*EntityArchetypeLOD, error) {
 	_, doesExist := c.lods[lodLevel]
 	if doesExist {
 		return nil, fmt.Errorf("lod level %d already exists", lodLevel)
 	}
-	lod := NewEntityLod(lodLevel, componentFields)
+	lod := NewEntityLod(lodLevel, items)
 	c.lods[lodLevel] = lod
 	return lod, nil
 }

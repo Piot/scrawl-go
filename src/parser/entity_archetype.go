@@ -30,14 +30,10 @@ import "github.com/piot/scrawl-go/src/definition"
 
 func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
 	validComponentTypes []string) (*definition.EntityArchetype, error) {
-	name, fields, err := p.parseNameAndFields()
+	name, items, err := p.parseArchetypeNameAndItems()
 	if err != nil {
 		return nil, err
 	}
-	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields, validComponentTypes)
-	if componentFieldsErr != nil {
-		return nil, componentFieldsErr
-	}
-	entity := definition.NewEntity(name, entityIndex, componentFields)
+	entity := definition.NewEntityArchetype(name, entityIndex, items)
 	return entity, nil
 }

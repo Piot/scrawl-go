@@ -26,13 +26,11 @@ SOFTWARE.
 
 package parser
 
-import "github.com/piot/scrawl-go/src/definition"
+import (
+	"github.com/piot/scrawl-go/src/definition"
+)
 
-func (p *Parser) parseComponent(index uint8) (*definition.ComponentDataType, error) {
-	name, fields, eventReferences, commandReferences, err := p.parseNameAndFieldsAndReferences()
-	if err != nil {
-		return nil, err
-	}
-	component := definition.NewComponentDataType(name, index, fields)
-	return component, nil
+func (p *Parser) parseEntityArchetypeItem(index int, itemTypeString string) (*definition.EntityArchetypeItem, error) {
+	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentTypes, itemTypeString)
+	return archetypeItem, archetypeItemErr
 }

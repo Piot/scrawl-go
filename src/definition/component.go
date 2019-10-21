@@ -29,15 +29,13 @@ package definition
 import "fmt"
 
 type ComponentDataType struct {
-	name              string
-	index             uint8
-	fields            []*Field
-	eventReferences   []*EventReference
-	commandReferences []*CommandReference
+	name   string
+	index  uint8
+	fields []*Field
 }
 
-func NewComponentDataType(name string, index uint8, fields []*Field, eventReferences []*EventReference, commandReferences []*CommandReference) *ComponentDataType {
-	return &ComponentDataType{name: name, index: index, fields: fields, eventReferences: eventReferences, commandReferences: commandReferences}
+func NewComponentDataType(name string, index uint8, fields []*Field) *ComponentDataType {
+	return &ComponentDataType{name: name, index: index, fields: fields}
 }
 
 func (c *ComponentDataType) Name() string {
@@ -52,17 +50,9 @@ func (c *ComponentDataType) Fields() []*Field {
 	return c.fields
 }
 
-func (c *ComponentDataType) EventReferences() []*EventReference {
-	return c.eventReferences
-}
-
-func (c *ComponentDataType) CommandReferences() []*CommandReference {
-	return c.commandReferences
-}
-
 func (c *ComponentDataType) String() string {
 	var s string
-	s += fmt.Sprintf("[component '%v' fields:%d]\n", c.name, len(c.fields))
+	s += fmt.Sprintf("[componentdatatype '%v' fields:%d]\n", c.name, len(c.fields))
 	for _, field := range c.fields {
 		s += "    " + field.String() + "\n"
 	}

@@ -26,29 +26,13 @@ SOFTWARE.
 
 package parser
 
-import (
-	"fmt"
+import "github.com/piot/scrawl-go/src/definition"
 
-	"github.com/piot/scrawl-go/src/definition"
-	"github.com/piot/scrawl-go/src/token"
-)
-
-func (p *Parser) parseComponentDataType(index int, name string) (*definition.Field, error) {
-	componentDataTypeString, componentDataTypeErr := p.parseSymbol()
-	if componentDataTypeErr != nil {
-		return &definition.Field{}, fmt.Errorf("Expected a componentDataType symbol (%v)", componentDataTypeErr)
+func (p *Parser) parseComponentDataType(index uint8) (*definition.ComponentDataType, error) {
+	name, fields, err := p.parseNameAndFields()
+	if err != nil {
+		return nil, err
 	}
-
-	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
-	if hopefullyLineDelimiterErr != nil {
-		return nil, hopefullyLineDelimiterErr
-	}
-
-	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
-	if !wasEndOfLine {
-		return nil, fmt.Errorf("Must end lines after componentDataType  token:%v", token)
-	}
-
-	componentDataType := definition.NewComponentDataType(index, name, componentDataTypeString)
-	return componentDataType, nil
+	component := definition.NewComponentDataType(name, index, fields)
+	return component, nil
 }

@@ -28,63 +28,66 @@ package definition
 
 import "fmt"
 
-type ComponentTypeVariant uint8
+type EntityArchetypeItemVariant uint8
 
 const (
-	ComponentTypeComponentReference ComponentTypeVariant = iota
+	ComponentTypeComponentReference EntityArchetypeItemVariant = iota
 	ComponentTypeField
 )
 
-type ComponentDataType struct {
-	component *ComponentDataType
-	field     *Field
-	variant   ComponentTypeVariant
+type EntityArchetypeItem struct {
+	componentDataType *ComponentDataType
+	fieldType         string
+	variant           EntityArchetypeItemVariant
 }
 
-func NewComponentTypeUsingField(field *Field) *ComponentDataType {
-	return &ComponentDataType{variant: ComponentTypeField, field: field}
+func NewEntityArchetypeItemUsingFieldType(fieldType string) *EntityArchetypeItem {
+	return &EntityArchetypeItem{variant: ComponentTypeField, fieldType: fieldType}
 }
 
-func NewComponentTypeUsingComponent(component *ComponentDataType) *ComponentDataType {
-	return &ComponentDataType{variant: ComponentTypeComponentReference, component: component}
+func NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataType *ComponentDataType) *EntityArchetypeItem {
+	return &EntityArchetypeItem{variant: ComponentTypeComponentReference, componentDataType: componentDataType}
 }
 
-func (c *ComponentDataType) HasFieldReference() bool {
+func (c *EntityArchetypeItem) HasFieldReference() bool {
 	return c.variant == ComponentTypeField
 }
 
-func (c *ComponentDataType) FieldReference() *Field {
+func (c *EntityArchetypeItem) FieldReference() string {
 	if c.variant != ComponentTypeField {
 		panic("wrong component field type")
 	}
-	return c.field
+	return c.fieldType
 }
 
-func (c *ComponentDataType) Name() string {
+func (c *EntityArchetypeItem) Name() string {
 	switch c.variant {
 	case ComponentTypeComponentReference:
-		return c.component.Name()
+		return c.componentDataType.Name()
 	case ComponentTypeField:
-		return c.field.FieldType()
+		return c.fieldType
 	}
 	panic("unknown component type")
 }
 
-func (c *ComponentDataType) HasComponentReference() bool {
+func (c *EntityArchetypeItem) HasComponentReference() bool {
 	return c.variant == ComponentTypeComponentReference
 }
 
-func (c *ComponentDataType) ComponentDataType() *ComponentDataType {
-	return c.component
+func (c *EntityArchetypeItem) ComponentDataType() *ComponentDataType {
+	if c.variant != ComponentTypeComponentReference {
+		panic("wrong component field type")
+	}
+	return c.componentDataType
 }
 
-func (c *ComponentDataType) String() string {
+func (c *EntityArchetypeItem) String() string {
 	var s string
 	switch c.variant {
 	case ComponentTypeComponentReference:
-		s += fmt.Sprintf("[componenttype '%v']", c.component)
+		s += fmt.Sprintf("[componenttype '%v']", c.componentDataType)
 	case ComponentTypeField:
-		s += fmt.Sprintf("[componenttype '%v']", c.field)
+		s += fmt.Sprintf("[componenttype '%v']", c.fieldType)
 	}
 	return s
 }

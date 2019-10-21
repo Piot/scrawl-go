@@ -53,7 +53,7 @@ func (r *Root) Hash() Hash {
 	return r.hash
 }
 
-func (r *Root) FindComponent(name string) *ComponentDataType {
+func (r *Root) FindComponentDataType(name string) *ComponentDataType {
 	for _, component := range r.components {
 		if component.Name() == name {
 			return component

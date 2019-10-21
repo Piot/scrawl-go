@@ -33,18 +33,6 @@ import (
 	"github.com/piot/scrawl-go/src/token"
 )
 
-func (p *Parser) parseNames() (string, []*definition.Field, error) {
-	name, nameErr := p.parseNameAndStartScope()
-	if nameErr != nil {
-		return "", nil, nameErr
-	}
-	fields, fieldsErr := p.parseNamesUntilEndScope()
-	if fieldsErr != nil {
-		return "", nil, fieldsErr
-	}
-	return name, fields, nil
-}
-
 func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	name, nameErr := p.parseNameAndStartScope()
 	if nameErr != nil {
@@ -57,16 +45,16 @@ func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	return name, fields, nil
 }
 
-func (p *Parser) parseNameAndFieldsAndReferences() (string, []*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
+func (p *Parser) parseArchetypeNameAndItems() (string, []*definition.EntityArchetypeItem, error) {
 	name, nameErr := p.parseNameAndStartScope()
 	if nameErr != nil {
-		return "", nil, nil, nil, nameErr
+		return "", nil, nameErr
 	}
-	fields, eventReferences, commandReferences, fieldsErr := p.parseFieldsAndEventsUntilEndScope()
+	fields, fieldsErr := p.parseEntityArchetypeItemsUntilEndScope()
 	if fieldsErr != nil {
-		return "", nil, nil, nil, fieldsErr
+		return "", nil, fieldsErr
 	}
-	return name, fields, eventReferences, commandReferences, nil
+	return name, fields, nil
 }
 
 func (p *Parser) parseIntegerAndFields() (int, []*definition.Field, error) {
@@ -99,6 +87,7 @@ func (p *Parser) parseNameAndStartScope() (string, error) {
 	if symbolErr != nil {
 		return "", symbolErr
 	}
+	fmt.Printf("name:%v\n", name)
 	startScopeErr := p.parseStartScope()
 	if startScopeErr != nil {
 		return "", startScopeErr
@@ -133,8 +122,22 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 	return nil, nil
 }
 
-func (p *Parser) parseComponentDataTypesUntilEndScope() ([]*definition.ComponentDataType, error) {
-	var fields []*definition.ComponentDataType
+func convertEntityArchetypeItem(root *definition.Root, validComponentTypes []string, typeName string) (*definition.EntityArchetypeItem, error) {
+	componentDataTypeReference := root.FindComponentDataType(typeName)
+	var archetypeItem *definition.EntityArchetypeItem
+	if componentDataTypeReference == nil {
+		if !Contains(validComponentTypes, typeName) {
+			return nil, fmt.Errorf("unknown component type:%v", typeName)
+		}
+		archetypeItem = definition.NewEntityArchetypeItemUsingFieldType(typeName)
+	} else {
+		archetypeItem = definition.NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataTypeReference)
+	}
+	return archetypeItem, nil
+}
+
+func (p *Parser) parseEntityArchetypeItemsUntilEndScope() ([]*definition.EntityArchetypeItem, error) {
+	var items []*definition.EntityArchetypeItem
 
 	for true {
 		t, tokenErr := p.readNext()
@@ -145,65 +148,19 @@ func (p *Parser) parseComponentDataTypesUntilEndScope() ([]*definition.Component
 		if !wasSymbol {
 			_, wasEndScope := t.(token.EndScopeToken)
 			if wasEndScope {
-				return fields, nil
+				return items, nil
 			}
-			return nil, fmt.Errorf("Expected fieldname or end of scope")
+			return nil, fmt.Errorf("Expected component data type field reference or end of scope")
 		}
+		fmt.Printf("checking symbol:%v\n", symbolToken)
 
-		parsedField, parseFieldErr := p.parseComponentDataType(len(fields), symbolToken.Symbol)
+		parsedField, parseFieldErr := p.parseEntityArchetypeItem(len(items), symbolToken.Symbol)
 		if parseFieldErr != nil {
 			return nil, parseFieldErr
 		}
-		fields = append(fields, parsedField)
+		items = append(items, parsedField)
 	}
 	return nil, nil
-}
-
-func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
-	var fields []*definition.Field
-	var events []*definition.EventReference
-	var commands []*definition.CommandReference
-
-	for true {
-		t, tokenErr := p.readNext()
-		if tokenErr != nil {
-			return nil, nil, nil, tokenErr
-		}
-		symbolToken, wasSymbol := t.(token.SymbolToken)
-		if !wasSymbol {
-			_, wasEndScope := t.(token.EndScopeToken)
-			if wasEndScope {
-				return fields, events, commands, nil
-			}
-			return nil, nil, nil, fmt.Errorf("Expected fieldname, event or end of scope")
-		}
-
-		isEvent := (symbolToken.Symbol == "event")
-		isCommand := (symbolToken.Symbol == "command")
-
-		if isEvent {
-			eventReferenceIndexValue := definition.EventReferenceIndex(len(events))
-			parsedEventReference, parsedEventErr := p.parseEventReference(eventReferenceIndexValue)
-			if parsedEventErr != nil {
-				return nil, nil, nil, parsedEventErr
-			}
-			events = append(events, parsedEventReference)
-		} else if isCommand {
-			commandReferenceIndexValue := definition.CommandReferenceIndex(len(commands))
-			parsedCommandReference, parsedCommandErr := p.parseCommandReference(commandReferenceIndexValue)
-			if parsedCommandErr != nil {
-				return nil, nil, nil, parsedCommandErr
-			}
-			commands = append(commands, parsedCommandReference)
-		} else {
-			parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
-			if parseFieldErr != nil {
-				return nil, nil, nil, parseFieldErr
-			}
-			fields = append(fields, parsedField)
-		}
-	}
-	return nil, nil, nil, nil
 }
 
 func (p *Parser) parseEnumConstantsUntilEndScope() ([]*definition.EnumConstant, error) {

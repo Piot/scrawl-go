@@ -90,7 +90,7 @@ func (p *Parser) next() (bool, error) {
 		switch symbolToken.Symbol {
 		case "component":
 			index := uint8(len(p.root.Components()))
-			component, err := p.parseComponent(index)
+			component, err := p.parseComponentDataType(index)
 			if err != nil {
 				return false, err
 			}
@@ -101,11 +101,12 @@ func (p *Parser) next() (bool, error) {
 				return false, err
 			}
 			p.root.AddUserType(userType)
-		case "lod":
-			_, err := p.parseLod(p.lastEntity, p.validComponentTypes)
-			if err != nil {
-				return false, err
-			}
+		/*case "lod":
+		_, err := p.parseLod(p.lastEntity, p.validComponentTypes)
+		if err != nil {
+			return false, err
+		}
+		*/
 		case "archetype":
 			index := uint8(len(p.root.Archetypes()))
 			entityIndex := definition.NewEntityIndex(index)
