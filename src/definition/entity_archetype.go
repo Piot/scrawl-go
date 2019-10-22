@@ -38,9 +38,7 @@ type EntityArchetype struct {
 	lods         map[int]*EntityArchetypeLOD
 }
 
-func NewEntityArchetype(name string, index EntityIndex, items []*EntityArchetypeItem) *EntityArchetype {
-	lods := make(map[int]*EntityArchetypeLOD, 1)
-	lods[0] = NewEntityLod(0, items)
+func NewEntityArchetype(name string, index EntityIndex, lods map[int]*EntityArchetypeLOD) *EntityArchetype {
 	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods}
 }
 
@@ -52,7 +50,9 @@ func (c *EntityArchetype) String() string {
 	for k := range c.lods {
 		keys = append(keys, k)
 	}
+
 	sort.Ints(keys)
+
 	for _, key := range keys {
 		lod := c.lods[key]
 		s += lod.String()
@@ -70,8 +70,10 @@ func (c *EntityArchetype) NewLod(lodLevel int, items []*EntityArchetypeItem) (*E
 	if doesExist {
 		return nil, fmt.Errorf("lod level %d already exists", lodLevel)
 	}
-	lod := NewEntityLod(lodLevel, items)
+
+	lod := NewEntityArchetypeLOD(lodLevel, items)
 	c.lods[lodLevel] = lod
+
 	return lod, nil
 }
 

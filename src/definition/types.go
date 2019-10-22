@@ -30,19 +30,16 @@ import (
 	"fmt"
 )
 
-type Type struct {
-	name string
-}
 type Hash uint32
 
 type Root struct {
-	components []*ComponentDataType
-	userTypes  []*UserType
-	entities   []*EntityArchetype
-	commands   []*Command
-	events     []*Event
-	enums      []*Enum
-	hash       Hash
+	componentDataTypes []*ComponentDataType
+	userTypes          []*UserType
+	archetypes         []*EntityArchetype
+	commands           []*Command
+	events             []*Event
+	enums              []*Enum
+	hash               Hash
 }
 
 func (r *Root) SetHash(hash Hash) {
@@ -54,7 +51,7 @@ func (r *Root) Hash() Hash {
 }
 
 func (r *Root) FindComponentDataType(name string) *ComponentDataType {
-	for _, component := range r.components {
+	for _, component := range r.componentDataTypes {
 		if component.Name() == name {
 			return component
 		}
@@ -63,7 +60,7 @@ func (r *Root) FindComponentDataType(name string) *ComponentDataType {
 }
 
 func (r *Root) FindEntity(name string) *EntityArchetype {
-	for _, entity := range r.entities {
+	for _, entity := range r.archetypes {
 		if entity.Name() == name {
 			return entity
 		}
@@ -83,19 +80,19 @@ func (r *Root) FindUserType(name string) *UserType {
 func (r *Root) String() string {
 	var s string
 
-	s += fmt.Sprintf("ComponentDataType-types: %d\n", len(r.components))
-	s += fmt.Sprintf("Archetypes: %d\n", len(r.entities))
+	s += fmt.Sprintf("ComponentDataType-types: %d\n", len(r.componentDataTypes))
+	s += fmt.Sprintf("Archetypes: %d\n", len(r.archetypes))
 	s += fmt.Sprintf("User-types: %d\n", len(r.userTypes))
 
-	for _, entity := range r.entities {
+	for _, entity := range r.archetypes {
 		s += entity.String() + "\n"
 	}
 
 	return s
 }
 
-func (r *Root) Components() []*ComponentDataType {
-	return r.components
+func (r *Root) ComponentDataTypes() []*ComponentDataType {
+	return r.componentDataTypes
 }
 
 func (r *Root) Enums() []*Enum {
@@ -111,23 +108,23 @@ func (r *Root) Commands() []*Command {
 }
 
 func (r *Root) Archetypes() []*EntityArchetype {
-	return r.entities
+	return r.archetypes
 }
 
 func (r *Root) UserTypes() []*UserType {
 	return r.userTypes
 }
 
-func (r *Root) AddComponent(c *ComponentDataType) {
-	r.components = append(r.components, c)
+func (r *Root) AddComponentDataType(c *ComponentDataType) {
+	r.componentDataTypes = append(r.componentDataTypes, c)
 }
 
 func (r *Root) AddUserType(c *UserType) {
 	r.userTypes = append(r.userTypes, c)
 }
 
-func (r *Root) AddEntity(c *EntityArchetype) {
-	r.entities = append(r.entities, c)
+func (r *Root) AddArchetype(c *EntityArchetype) {
+	r.archetypes = append(r.archetypes, c)
 }
 
 func (r *Root) AddEvent(c *Event) {

@@ -39,14 +39,15 @@ type EntityArchetypeItem struct {
 	componentDataType *ComponentDataType
 	fieldType         string
 	variant           EntityArchetypeItemVariant
+	meta              MetaData
 }
 
-func NewEntityArchetypeItemUsingFieldType(fieldType string) *EntityArchetypeItem {
-	return &EntityArchetypeItem{variant: ComponentTypeField, fieldType: fieldType}
+func NewEntityArchetypeItemUsingFieldType(fieldType string, meta MetaData) *EntityArchetypeItem {
+	return &EntityArchetypeItem{variant: ComponentTypeField, fieldType: fieldType, meta: meta}
 }
 
-func NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataType *ComponentDataType) *EntityArchetypeItem {
-	return &EntityArchetypeItem{variant: ComponentTypeComponentReference, componentDataType: componentDataType}
+func NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataType *ComponentDataType, meta MetaData) *EntityArchetypeItem {
+	return &EntityArchetypeItem{variant: ComponentTypeComponentReference, componentDataType: componentDataType, meta: meta}
 }
 
 func (c *EntityArchetypeItem) HasFieldReference() bool {
@@ -57,6 +58,7 @@ func (c *EntityArchetypeItem) FieldReference() string {
 	if c.variant != ComponentTypeField {
 		panic("wrong component field type")
 	}
+
 	return c.fieldType
 }
 

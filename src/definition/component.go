@@ -53,6 +53,7 @@ func (c *ComponentDataType) Fields() []*Field {
 func (c *ComponentDataType) String() string {
 	var s string
 	s += fmt.Sprintf("[componentdatatype '%v' fields:%d]\n", c.name, len(c.fields))
+
 	for _, field := range c.fields {
 		s += "    " + field.String() + "\n"
 	}

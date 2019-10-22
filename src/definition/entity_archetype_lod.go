@@ -7,7 +7,11 @@ type EntityArchetypeLOD struct {
 	items    []*EntityArchetypeItem
 }
 
-func (c *EntityArchetypeLOD) ComponentDataType(index int) *EntityArchetypeItem {
+func (c *EntityArchetypeLOD) Level() int {
+	return c.lodLevel
+}
+
+func (c *EntityArchetypeLOD) EntityArchetypeItem(index int) *EntityArchetypeItem {
 	return c.items[index]
 }
 
@@ -17,14 +21,17 @@ func (c *EntityArchetypeLOD) Items() []*EntityArchetypeItem {
 
 func (c *EntityArchetypeLOD) String() string {
 	var s string
-	s += fmt.Sprintf("[lod%d components:%d\n", c.lodLevel, len(c.items))
+	s += fmt.Sprintf("[lod%d items:%d\n", c.lodLevel, len(c.items))
+
 	for _, field := range c.items {
 		s += "  " + field.String() + "\n"
 	}
+
 	s += "]"
+
 	return s
 }
 
-func NewEntityLod(lodLevel int, items []*EntityArchetypeItem) *EntityArchetypeLOD {
+func NewEntityArchetypeLOD(lodLevel int, items []*EntityArchetypeItem) *EntityArchetypeLOD {
 	return &EntityArchetypeLOD{lodLevel: lodLevel, items: items}
 }

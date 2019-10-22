@@ -31,6 +31,13 @@ import (
 )
 
 func (p *Parser) parseEntityArchetypeItem(index int, itemTypeString string) (*definition.EntityArchetypeItem, error) {
-	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentTypes, itemTypeString)
+	meta, _, metaErr := p.readMetaOrNewline()
+
+	if metaErr != nil {
+		return nil, metaErr
+	}
+
+	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentTypes, itemTypeString, meta)
+
 	return archetypeItem, archetypeItemErr
 }

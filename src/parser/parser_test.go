@@ -51,18 +51,18 @@ component Something
 
 	def := parser.Root()
 
-	if len(def.Components()) != 1 {
-		t.Errorf("Wrong number of components:%v", len(def.Components()))
+	if len(def.ComponentDataTypes()) != 1 {
+		t.Errorf("Wrong number of components:%v", len(def.ComponentDataTypes()))
 	}
 
-	firstComponent := def.Components()[0]
+	firstComponent := def.ComponentDataTypes()[0]
 	firstComponentName := firstComponent.Name()
 
 	if firstComponentName != "Something" {
 		t.Errorf("Wrong component-name:%v", firstComponentName)
 	}
 
-	fields := def.Components()[0].Fields()
+	fields := def.ComponentDataTypes()[0].Fields()
 	fieldCount := len(fields)
 	if fieldCount != 2 {
 		t.Errorf("Wrong number of fields:%v", fieldCount)
@@ -71,6 +71,7 @@ component Something
 	if fields[0].Name() != "hello" {
 		t.Errorf("Wrong field name:%v", fields[0].Name())
 	}
+
 	if fields[0].FieldType() != "int32" {
 		t.Errorf("Wrong field name:%v", fields[0].FieldType())
 	}
@@ -91,7 +92,7 @@ func TestIgnoringCarriageReturn(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	components := setup.Root().Components()
+	components := setup.Root().ComponentDataTypes()
 	if len(components) != 1 {
 		t.Errorf("Should have been 1")
 	}
@@ -117,7 +118,8 @@ component SomeOtherComponent
   event Jump
 
 archetype ThisISTheEntity2
-  AnotherComponent
+  lod 0
+    AnotherComponent
 
 event Jump
   where Position
@@ -135,23 +137,23 @@ command CommandName SomeType ReturnType
 	}
 
 	def := parser.Root()
-	if len(def.Components()) != 2 {
-		t.Errorf("Wrong number of components:%v", len(def.Components()))
+	if len(def.ComponentDataTypes()) != 2 {
+		t.Errorf("Wrong number of components:%v", len(def.ComponentDataTypes()))
 	}
 
 	event := def.Events()[0]
 	if event.Name() != "Jump" {
 		t.Errorf("Wrong event name:%v", event)
 	}
-	firstComponent := def.Components()[0]
+	firstComponent := def.ComponentDataTypes()[0]
 	firstComponentName := firstComponent.Name()
 	if firstComponentName != "AnotherComponent" {
 		t.Errorf("Wrong component-name:%v", firstComponentName)
 	}
 
-	fields := def.Components()[0].Fields()
+	fields := def.ComponentDataTypes()[0].Fields()
 	fieldCount := len(fields)
-	if fieldCount != 2 {
+	if fieldCount != 3 {
 		t.Errorf("Wrong number of fields:%v", fieldCount)
 	}
 
@@ -247,22 +249,32 @@ component SomeOtherComponent
   something Integer
 
 archetype ThisISTheEntity2
-  SomeOtherComponent
-  WorldPosition [range "0-122"]
-
+  lod 0
+    WorldPosition  [range   "0-122"]
+    SomeOtherComponent
+  lod 1
+    WorldPosition  [range   "0-122"]
 `)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	def := parser.Root()
-	archetypeToTest := def.Archetypes()[0].HighestLevelOfDetail()
-	secondComponentData := archetypeToTest.ComponentDataType(1)
+	archetypeToTest := def.Archetypes()[0]
+	firstLod := archetypeToTest.HighestLevelOfDetail()
+	secondComponentData := firstLod.EntityArchetypeItem(1)
 	raw := secondComponentData.Name()
 
-	if raw != "WorldPosition" {
-		t.Errorf("Wrong type %v", raw)
+	if raw != "SomeOtherComponent" {
+		t.Errorf("wrong type %v", raw)
+	}
+
+	secondLod := archetypeToTest.Lod(1)
+	secondLodItem := secondLod.EntityArchetypeItem(0)
+	raw2 := secondLodItem.Name()
+	if raw2 != "WorldPosition" {
+		t.Errorf("wrong type %v", raw2)
 	}
 
 }
