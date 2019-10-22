@@ -26,17 +26,20 @@ SOFTWARE.
 
 package parser
 
-import "github.com/piot/scrawl-go/src/definition"
+import (
+	"github.com/piot/scrawl-go/src/definition"
+)
 
-func (p *Parser) parseLod(lastEntity *definition.Entity, validComponentTypes []string) (*definition.EntityLod, error) {
-	lodLevel, fields, err := p.parseIntegerAndFields()
+func (p *Parser) parseLod(validComponentTypes []string) (*definition.EntityArchetypeLOD, error) {
+	lodLevel, err := p.parseIntegerAndStartScope()
 	if err != nil {
 		return nil, err
 	}
-	componentFields, componentFieldsErr := MakeComponentFields(p.root, fields, validComponentTypes)
-	if componentFieldsErr != nil {
-		return nil, componentFieldsErr
+	entityArchetypeItems, entityArchetypeItemsErr := p.parseEntityArchetypeItemsUntilEndScope()
+
+	if entityArchetypeItemsErr != nil {
+		return nil, entityArchetypeItemsErr
 	}
 
-	return lastEntity.NewLod(lodLevel, componentFields)
+	return definition.NewEntityArchetypeLOD(lodLevel, entityArchetypeItems), nil
 }

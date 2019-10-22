@@ -61,7 +61,7 @@ func parseOptions() (string, bool, bool, string) {
 func printRoot(root *definition.Root) {
 	fmt.Printf("--- Summary ---\n")
 	fmt.Printf("Hash:%04x\n", root.Hash())
-	for _, entity := range root.Entities() {
+	for _, entity := range root.Archetypes() {
 		fmt.Printf("%v\n", entity)
 	}
 }

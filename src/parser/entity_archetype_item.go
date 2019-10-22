@@ -26,25 +26,18 @@ SOFTWARE.
 
 package parser
 
-import "github.com/piot/scrawl-go/src/definition"
+import (
+	"github.com/piot/scrawl-go/src/definition"
+)
 
-func (p *Parser) parseEventReference(index definition.EventReferenceIndex) (*definition.EventReference, error) {
-	/*
-		name, symbolErr := p.parseSymbol()
-		if symbolErr != nil {
-			return nil, symbolErr
-		}
-	*/
-	eventTypeName, eventTypeNameErr := p.parseSymbol()
-	if eventTypeNameErr != nil {
-		return nil, eventTypeNameErr
+func (p *Parser) parseEntityArchetypeItem(index int, itemTypeString string) (*definition.EntityArchetypeItem, error) {
+	meta, _, metaErr := p.readMetaOrNewline()
+
+	if metaErr != nil {
+		return nil, metaErr
 	}
 
-	hopefullyLineDelimiterErr := p.expectLineDelimiter()
-	if hopefullyLineDelimiterErr != nil {
-		return nil, hopefullyLineDelimiterErr
-	}
+	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentTypes, itemTypeString, meta)
 
-	eventReference := definition.NewEventReference(index, eventTypeName)
-	return eventReference, nil
+	return archetypeItem, archetypeItemErr
 }

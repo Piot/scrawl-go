@@ -32,13 +32,13 @@ type CommandReferenceIndex uint8
 
 type CommandReference struct {
 	commandType   string
-	commandTypeID EntityTypeID
+	commandTypeID EntityArchetypeID
 	index         CommandReferenceIndex
 }
 
 func NewCommandReference(index CommandReferenceIndex, CommandType string) *CommandReference {
 	return &CommandReference{
-		commandTypeID: NewEntityTypeIDFromString(CommandType),
+		commandTypeID: NewEntityArchetypeIDFromString(CommandType),
 		index:         index,
 		commandType:   CommandType}
 }
@@ -47,7 +47,7 @@ func (e *CommandReference) ReferencedType() string {
 	return e.commandType
 }
 
-func (c *CommandReference) ID() EntityTypeID {
+func (c *CommandReference) ID() EntityArchetypeID {
 	return c.commandTypeID
 }
 

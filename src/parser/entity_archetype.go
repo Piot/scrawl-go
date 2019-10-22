@@ -30,25 +30,53 @@ import (
 	"fmt"
 
 	"github.com/piot/scrawl-go/src/definition"
+	"github.com/piot/scrawl-go/src/token"
 )
 
-func (p *Parser) parseCommandReference(index definition.CommandReferenceIndex) (*definition.CommandReference, error) {
-	/*
-		name, symbolErr := p.parseSymbol()
-		if symbolErr != nil {
-			return nil, symbolErr
+func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
+	validComponentTypes []string) (*definition.EntityArchetype, error) {
+
+	name, nameErr := p.parseArchetypeNameAndStartScope()
+	if nameErr != nil {
+		return nil, nameErr
+	}
+
+	lods := make(map[int]*definition.EntityArchetypeLOD)
+	expectedLevel := 0
+
+	for {
+		t, tErr := p.readNext()
+		if tErr != nil {
+			return nil, tErr
 		}
-	*/
-	commandTypeName, commandTypeNameErr := p.parseSymbol()
-	if commandTypeNameErr != nil {
-		return nil, commandTypeNameErr
+
+		_, isEndOfScope := t.(token.EndScopeToken)
+		if isEndOfScope {
+			break
+		}
+
+		symbol, isSymbol := t.(token.SymbolToken)
+		if !isSymbol {
+			return nil, fmt.Errorf("expected end of scope or 'lod' %v", t)
+		}
+
+		if symbol.Symbol != "lod" {
+			return nil, fmt.Errorf("expected 'lod' %v", symbol)
+		}
+
+		lod, err := p.parseLod(p.validComponentTypes)
+		if err != nil {
+			return nil, err
+		}
+
+		if lod.Level() != expectedLevel {
+			return nil, fmt.Errorf("wrong lod:%v", lod)
+		}
+
+		lods[lod.Level()] = lod
+		expectedLevel++
 	}
 
-	hopefullyLineDelimiterErr := p.expectLineDelimiter()
-	if hopefullyLineDelimiterErr != nil {
-		return nil, fmt.Errorf("command reference:%v", hopefullyLineDelimiterErr)
-	}
-
-	commandReference := definition.NewCommandReference(index, commandTypeName)
-	return commandReference, nil
+	entity := definition.NewEntityArchetype(name, entityIndex, lods)
+	return entity, nil
 }

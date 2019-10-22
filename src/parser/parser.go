@@ -51,7 +51,7 @@ type Parser struct {
 	tokenizer           *tokenize.Tokenizer
 	root                *definition.Root
 	lastToken           token.Token
-	lastEntity          *definition.Entity
+	lastEntity          *definition.EntityArchetype
 	validComponentTypes []string
 }
 
@@ -89,31 +89,27 @@ func (p *Parser) next() (bool, error) {
 	if wasSymbol {
 		switch symbolToken.Symbol {
 		case "component":
-			index := uint8(len(p.root.Components()))
-			component, err := p.parseComponent(index)
+			index := uint8(len(p.root.ComponentDataTypes()))
+			component, err := p.parseComponentDataType(index)
 			if err != nil {
 				return false, err
 			}
-			p.root.AddComponent(component)
+			p.root.AddComponentDataType(component)
 		case "type":
 			userType, err := p.parseUserType()
 			if err != nil {
 				return false, err
 			}
 			p.root.AddUserType(userType)
-		case "lod":
-			_, err := p.parseLod(p.lastEntity, p.validComponentTypes)
-			if err != nil {
-				return false, err
-			}
-		case "entity":
-			index := uint8(len(p.root.Entities()))
+
+		case "archetype":
+			index := uint8(len(p.root.Archetypes()))
 			entityIndex := definition.NewEntityIndex(index)
-			entity, err := p.parseEntity(entityIndex, p.validComponentTypes)
+			entity, err := p.parseEntityArchetype(entityIndex, p.validComponentTypes)
 			if err != nil {
 				return false, err
 			}
-			p.root.AddEntity(entity)
+			p.root.AddArchetype(entity)
 			p.lastEntity = entity
 		case "event":
 			event, err := p.parseEvent()

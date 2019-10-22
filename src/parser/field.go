@@ -30,7 +30,6 @@ import (
 	"fmt"
 
 	"github.com/piot/scrawl-go/src/definition"
-	"github.com/piot/scrawl-go/src/token"
 )
 
 func (p *Parser) parseField(index int, name string) (*definition.Field, error) {
@@ -39,27 +38,9 @@ func (p *Parser) parseField(index int, name string) (*definition.Field, error) {
 		return &definition.Field{}, fmt.Errorf("Expected a field symbol (%v)", fieldTypeErr)
 	}
 
-	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
-	if hopefullyLineDelimiterErr != nil {
-		return nil, hopefullyLineDelimiterErr
-	}
-
-	_, isStartMeta := hopefullyLineDelimiter.(token.StartMetaDataToken)
-	var metaData definition.MetaData
-	if isStartMeta {
-		var metaDataErr error
-		metaData, metaDataErr = p.parseMetaData()
-		if metaDataErr != nil {
-			return nil, metaDataErr
-		}
-		hopefullyLineDelimiter, hopefullyLineDelimiterErr = p.readNext()
-		if hopefullyLineDelimiterErr != nil {
-			return nil, hopefullyLineDelimiterErr
-		}
-	}
-	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
-	if !wasEndOfLine {
-		return nil, fmt.Errorf("Must end lines after field  token:%v", token)
+	metaData, _, metaErr := p.readMetaOrNewline()
+	if metaErr != nil {
+		return nil, metaErr
 	}
 
 	field := definition.NewField(index, name, fieldType, metaData)

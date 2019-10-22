@@ -48,16 +48,16 @@ func (e EntityIndex) String() string {
 	return fmt.Sprintf("[entityindex %v]", e.id)
 }
 
-// EntityTypeID :
-type EntityTypeID struct {
+// EntityArchetypeID :
+type EntityArchetypeID struct {
 	id uint16
 }
 
-func (e EntityTypeID) Value() uint16 {
+func (e EntityArchetypeID) Value() uint16 {
 	return e.id
 }
 
-func (e EntityTypeID) String() string {
+func (e EntityArchetypeID) String() string {
 	return fmt.Sprintf("[entitytypeid %v]", e.id)
 }
 
@@ -73,6 +73,6 @@ func typeHash(name string) uint16 {
 	return w
 }
 
-func NewEntityTypeIDFromString(name string) EntityTypeID {
-	return EntityTypeID{id: typeHash(name)}
+func NewEntityArchetypeIDFromString(name string) EntityArchetypeID {
+	return EntityArchetypeID{id: typeHash(name)}
 }

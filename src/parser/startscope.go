@@ -40,7 +40,7 @@ func (p *Parser) parseStartScope() error {
 
 	_, wasStartScope := maybeStartScope.(token.StartScopeToken)
 	if !wasStartScope {
-		return fmt.Errorf("Missing start scope %v", maybeStartScope)
+		return fmt.Errorf("missing start scope %v", maybeStartScope)
 	}
 
 	return nil

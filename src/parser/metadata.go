@@ -35,7 +35,7 @@ import (
 
 func (p *Parser) parseMetaData() (definition.MetaData, error) {
 	metaData := definition.MetaData{Values: make(map[string]string)}
-	for true {
+	for {
 		t, tokenErr := p.readNext()
 		if tokenErr != nil {
 			return definition.MetaData{}, tokenErr

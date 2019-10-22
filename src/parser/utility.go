@@ -45,16 +45,12 @@ func (p *Parser) parseNameAndFields() (string, []*definition.Field, error) {
 	return name, fields, nil
 }
 
-func (p *Parser) parseNameAndFieldsAndReferences() (string, []*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
+func (p *Parser) parseArchetypeNameAndStartScope() (string, error) {
 	name, nameErr := p.parseNameAndStartScope()
 	if nameErr != nil {
-		return "", nil, nil, nil, nameErr
+		return "", nameErr
 	}
-	fields, eventReferences, commandReferences, fieldsErr := p.parseFieldsAndEventsUntilEndScope()
-	if fieldsErr != nil {
-		return "", nil, nil, nil, fieldsErr
-	}
-	return name, fields, eventReferences, commandReferences, nil
+	return name, nil
 }
 
 func (p *Parser) parseIntegerAndFields() (int, []*definition.Field, error) {
@@ -98,7 +94,7 @@ func (p *Parser) parseNameAndStartScope() (string, error) {
 func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 	var fields []*definition.Field
 
-	for true {
+	for {
 		t, tokenErr := p.readNext()
 		if tokenErr != nil {
 			return nil, tokenErr
@@ -118,60 +114,95 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 		}
 		fields = append(fields, parsedField)
 	}
-	return nil, nil
 }
 
-func (p *Parser) parseFieldsAndEventsUntilEndScope() ([]*definition.Field, []*definition.EventReference, []*definition.CommandReference, error) {
-	var fields []*definition.Field
-	var events []*definition.EventReference
-	var commands []*definition.CommandReference
-
-	for true {
-		t, tokenErr := p.readNext()
-		if tokenErr != nil {
-			return nil, nil, nil, tokenErr
+func convertEntityArchetypeItem(root *definition.Root, validComponentTypes []string, typeName string, meta definition.MetaData) (*definition.EntityArchetypeItem, error) {
+	componentDataTypeReference := root.FindComponentDataType(typeName)
+	var archetypeItem *definition.EntityArchetypeItem
+	if componentDataTypeReference == nil {
+		if !Contains(validComponentTypes, typeName) {
+			return nil, fmt.Errorf("unknown component type:%v", typeName)
 		}
-		symbolToken, wasSymbol := t.(token.SymbolToken)
-		if !wasSymbol {
-			_, wasEndScope := t.(token.EndScopeToken)
-			if wasEndScope {
-				return fields, events, commands, nil
-			}
-			return nil, nil, nil, fmt.Errorf("Expected fieldname, event or end of scope")
+		archetypeItem = definition.NewEntityArchetypeItemUsingFieldType(typeName, meta)
+	} else {
+		archetypeItem = definition.NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataTypeReference, meta)
+	}
+	return archetypeItem, nil
+}
+
+func (p *Parser) readMetaOrNewline() (definition.MetaData, bool, error) {
+	hopefullyLineDelimiter, hopefullyLineDelimiterErr := p.readNext()
+	if hopefullyLineDelimiterErr != nil {
+		return definition.MetaData{}, false, hopefullyLineDelimiterErr
+	}
+
+	_, isStartMeta := hopefullyLineDelimiter.(token.StartMetaDataToken)
+
+	var metaData definition.MetaData
+
+	if isStartMeta {
+		var metaDataErr error
+
+		metaData, metaDataErr = p.parseMetaData()
+		if metaDataErr != nil {
+			return definition.MetaData{}, false, metaDataErr
 		}
-
-		isEvent := (symbolToken.Symbol == "event")
-		isCommand := (symbolToken.Symbol == "command")
-
-		if isEvent {
-			eventReferenceIndexValue := definition.EventReferenceIndex(len(events))
-			parsedEventReference, parsedEventErr := p.parseEventReference(eventReferenceIndexValue)
-			if parsedEventErr != nil {
-				return nil, nil, nil, parsedEventErr
-			}
-			events = append(events, parsedEventReference)
-		} else if isCommand {
-			commandReferenceIndexValue := definition.CommandReferenceIndex(len(commands))
-			parsedCommandReference, parsedCommandErr := p.parseCommandReference(commandReferenceIndexValue)
-			if parsedCommandErr != nil {
-				return nil, nil, nil, parsedCommandErr
-			}
-			commands = append(commands, parsedCommandReference)
-		} else {
-			parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)
-			if parseFieldErr != nil {
-				return nil, nil, nil, parseFieldErr
-			}
-			fields = append(fields, parsedField)
+		hopefullyLineDelimiter, hopefullyLineDelimiterErr = p.readNext()
+		if hopefullyLineDelimiterErr != nil {
+			return definition.MetaData{}, false, hopefullyLineDelimiterErr
 		}
 	}
-	return nil, nil, nil, nil
+	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	if !wasEndOfLine {
+		return definition.MetaData{}, false, fmt.Errorf("must end lines or have meta information:%v", token)
+	}
+
+	return metaData, !isStartMeta, nil
+}
+
+func (p *Parser) symbolOrEndOfScope() (token.SymbolToken, bool, error) {
+	t, tokenErr := p.readNext()
+	if tokenErr != nil {
+		return token.SymbolToken{}, false, tokenErr
+	}
+
+	switch ct := t.(type) {
+	case token.EndScopeToken:
+		return token.SymbolToken{}, true, nil
+	case token.SymbolToken:
+		return ct, false, nil
+	}
+
+	return token.SymbolToken{}, false, fmt.Errorf("expected symbol or end of scope %v %T", t, t)
+}
+
+func (p *Parser) parseEntityArchetypeItemsUntilEndScope() ([]*definition.EntityArchetypeItem, error) {
+	var items []*definition.EntityArchetypeItem
+
+	for {
+		symbolToken, wasEndScope, symbolErr := p.symbolOrEndOfScope()
+		if symbolErr != nil {
+			return nil, symbolErr
+		}
+
+		if wasEndScope {
+			return items, nil
+		}
+
+		parsedField, parseFieldErr := p.parseEntityArchetypeItem(len(items), symbolToken.Symbol)
+
+		if parseFieldErr != nil {
+			return nil, parseFieldErr
+		}
+
+		items = append(items, parsedField)
+	}
 }
 
 func (p *Parser) parseEnumConstantsUntilEndScope() ([]*definition.EnumConstant, error) {
 	var fields []*definition.EnumConstant
 
-	for true {
+	for {
 		t, tokenErr := p.readNext()
 		if tokenErr != nil {
 			return nil, tokenErr
@@ -202,5 +233,4 @@ func (p *Parser) parseEnumConstantsUntilEndScope() ([]*definition.EnumConstant, 
 		enumConstant := definition.NewEnumConstant(index, symbolToken.Symbol, numberToken.Integer(), nil)
 		fields = append(fields, enumConstant)
 	}
-	return nil, nil
 }

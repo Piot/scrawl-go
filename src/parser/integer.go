@@ -38,8 +38,9 @@ func (p *Parser) parseInteger() (int, error) {
 		return 0, tokenErr
 	}
 	numberToken, wasNumber := t.(token.NumberToken)
+
 	if !wasNumber {
-		return 0, fmt.Errorf("Wasn't a number")
+		return 0, fmt.Errorf("wasn't a number %v", numberToken)
 	}
 
 	return numberToken.Integer(), nil
