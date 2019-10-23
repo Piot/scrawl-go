@@ -35,11 +35,11 @@ type EntityArchetype struct {
 	name         string
 	entityTypeID EntityArchetypeID
 	index        EntityIndex
-	lods         map[int]*EntityArchetypeLOD
+	lods         []*EntityArchetypeLOD
 	meta         MetaData
 }
 
-func NewEntityArchetype(name string, index EntityIndex, lods map[int]*EntityArchetypeLOD, meta MetaData) *EntityArchetype {
+func NewEntityArchetype(name string, index EntityIndex, lods []*EntityArchetypeLOD, meta MetaData) *EntityArchetype {
 	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods, meta: meta}
 }
 
@@ -67,13 +67,13 @@ func (c *EntityArchetype) Name() string {
 }
 
 func (c *EntityArchetype) NewLod(lodLevel int, items []*EntityArchetypeItem) (*EntityArchetypeLOD, error) {
-	_, doesExist := c.lods[lodLevel]
-	if doesExist {
-		return nil, fmt.Errorf("lod level %d already exists", lodLevel)
+	lastIndex := len(c.lods)
+	if lastIndex+1 != lodLevel {
+		return nil, fmt.Errorf("must add lods in order %v (%v)", lodLevel, lastIndex)
 	}
 
 	lod := NewEntityArchetypeLOD(lodLevel, items)
-	c.lods[lodLevel] = lod
+	c.lods = append(c.lods, lod)
 
 	return lod, nil
 }
@@ -92,6 +92,10 @@ func (c *EntityArchetype) HighestLevelOfDetail() *EntityArchetypeLOD {
 
 func (c *EntityArchetype) Lod(lodLevel int) *EntityArchetypeLOD {
 	return c.lods[lodLevel]
+}
+
+func (c *EntityArchetype) Lods() []*EntityArchetypeLOD {
+	return c.lods
 }
 
 func (c *EntityArchetype) Meta() MetaData {

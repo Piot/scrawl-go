@@ -33,15 +33,14 @@ import (
 	"github.com/piot/scrawl-go/src/token"
 )
 
-func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
-	validComponentTypes []string) (*definition.EntityArchetype, error) {
+func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex) (*definition.EntityArchetype, error) {
 
 	name, meta, nameErr := p.parseArchetypeNameAndStartScope()
 	if nameErr != nil {
 		return nil, nameErr
 	}
 
-	lods := make(map[int]*definition.EntityArchetypeLOD)
+	var lods []*definition.EntityArchetypeLOD
 	expectedLevel := 0
 
 	for {
@@ -73,10 +72,11 @@ func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
 			return nil, fmt.Errorf("wrong lod:%v", lod)
 		}
 
-		lods[lod.Level()] = lod
+		lods = append(lods, lod)
 		expectedLevel++
 	}
 
 	entity := definition.NewEntityArchetype(name, entityIndex, lods, meta)
+
 	return entity, nil
 }

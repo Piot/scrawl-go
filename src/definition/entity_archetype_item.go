@@ -40,10 +40,11 @@ type EntityArchetypeItem struct {
 	fieldType         string
 	variant           EntityArchetypeItemVariant
 	meta              MetaData
+	index             int
 }
 
-func NewEntityArchetypeItemUsingFieldType(fieldType string, meta MetaData) *EntityArchetypeItem {
-	return &EntityArchetypeItem{variant: ComponentTypeField, fieldType: fieldType, meta: meta}
+func NewEntityArchetypeItemUsingFieldType(index int, fieldType string, meta MetaData) *EntityArchetypeItem {
+	return &EntityArchetypeItem{index: index, variant: ComponentTypeField, fieldType: fieldType, meta: meta}
 }
 
 func NewEntityArchetypeItemUsingComponentDataTypeReference(componentDataType *ComponentDataType, meta MetaData) *EntityArchetypeItem {
@@ -96,4 +97,8 @@ func (c *EntityArchetypeItem) String() string {
 
 func (c *EntityArchetypeItem) Meta() MetaData {
 	return c.meta
+}
+
+func (c *EntityArchetypeItem) Index() int {
+	return c.index
 }

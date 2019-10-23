@@ -105,7 +105,7 @@ func (p *Parser) next() (bool, error) {
 		case "archetype":
 			index := uint8(len(p.root.Archetypes()))
 			entityIndex := definition.NewEntityIndex(index)
-			entity, err := p.parseEntityArchetype(entityIndex, p.validComponentTypes)
+			entity, err := p.parseEntityArchetype(entityIndex)
 			if err != nil {
 				return false, err
 			}

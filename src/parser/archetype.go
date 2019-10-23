@@ -16,7 +16,7 @@ func (p *Parser) parseGenericArchetype() (*definition.EntityArchetype, error) {
 
 	mainLod := definition.NewEntityArchetypeLOD(0, entityArchetypeItems)
 	archetype := definition.NewEntityArchetype(name, definition.NewEntityIndex(0xff),
-		map[int]*definition.EntityArchetypeLOD{0: mainLod}, meta)
+		[]*definition.EntityArchetypeLOD{mainLod}, meta)
 
 	return archetype, nil
 }

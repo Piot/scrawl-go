@@ -289,5 +289,4 @@ archetype ThisISTheEntity2
 	if raw2 != "WorldPosition" {
 		t.Errorf("wrong type %v", raw2)
 	}
-
 }
