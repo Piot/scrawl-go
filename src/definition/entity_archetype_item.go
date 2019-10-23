@@ -93,3 +93,7 @@ func (c *EntityArchetypeItem) String() string {
 	}
 	return s
 }
+
+func (c *EntityArchetypeItem) Meta() MetaData {
+	return c.meta
+}

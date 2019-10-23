@@ -36,10 +36,11 @@ type EntityArchetype struct {
 	entityTypeID EntityArchetypeID
 	index        EntityIndex
 	lods         map[int]*EntityArchetypeLOD
+	meta         MetaData
 }
 
-func NewEntityArchetype(name string, index EntityIndex, lods map[int]*EntityArchetypeLOD) *EntityArchetype {
-	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods}
+func NewEntityArchetype(name string, index EntityIndex, lods map[int]*EntityArchetypeLOD, meta MetaData) *EntityArchetype {
+	return &EntityArchetype{name: name, index: index, entityTypeID: NewEntityArchetypeIDFromString(name), lods: lods, meta: meta}
 }
 
 func (c *EntityArchetype) String() string {
@@ -91,4 +92,8 @@ func (c *EntityArchetype) HighestLevelOfDetail() *EntityArchetypeLOD {
 
 func (c *EntityArchetype) Lod(lodLevel int) *EntityArchetypeLOD {
 	return c.lods[lodLevel]
+}
+
+func (c *EntityArchetype) Meta() MetaData {
+	return c.meta
 }

@@ -29,34 +29,20 @@ package definition
 import "fmt"
 
 type Event struct {
-	name        string
-	fields      []*Field
-	eventTypeID EntityArchetypeID
+	archetype *EntityArchetype
 }
 
-func NewEvent(name string, fields []*Field) *Event {
-
-	return &Event{
-		name:        name,
-		fields:      fields,
-		eventTypeID: NewEntityArchetypeIDFromString(name)}
+func NewEvent(archetype *EntityArchetype) *Event {
+	return &Event{archetype: archetype}
 }
 
-func (e *Event) Fields() []*Field {
-	return e.fields
-}
-
-func (e *Event) Name() string {
-	return e.name
-}
-
-func (c *Event) ID() EntityArchetypeID {
-	return c.eventTypeID
+func (e *Event) Archetype() *EntityArchetype {
+	return e.archetype
 }
 
 func (e *Event) String() string {
 	var s string
-	s += fmt.Sprintf("[event '%v' %v]", e.name, e.fields)
+	s += fmt.Sprintf("[event %v]", e.archetype)
 
 	return s
 }

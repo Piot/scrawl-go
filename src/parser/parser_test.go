@@ -112,18 +112,13 @@ type SomeType
 component AnotherComponent
   usingTheType int [range "34-45", debug "hello world"]
   Name string
-  event Jump
-
-component SomeOtherComponent
-  event Jump
 
 archetype ThisISTheEntity2
   lod 0
     AnotherComponent
 
 event Jump
-  where Position
-  energy int [range "10-34"]
+  WorldPosition
 
 type ReturnType
   hello	 int32
@@ -137,12 +132,12 @@ command CommandName SomeType ReturnType
 	}
 
 	def := parser.Root()
-	if len(def.ComponentDataTypes()) != 2 {
+	if len(def.ComponentDataTypes()) != 1 {
 		t.Errorf("Wrong number of components:%v", len(def.ComponentDataTypes()))
 	}
 
 	event := def.Events()[0]
-	if event.Name() != "Jump" {
+	if event.Archetype().Name() != "Jump" {
 		t.Errorf("Wrong event name:%v", event)
 	}
 	firstComponent := def.ComponentDataTypes()[0]
@@ -153,7 +148,7 @@ command CommandName SomeType ReturnType
 
 	fields := def.ComponentDataTypes()[0].Fields()
 	fieldCount := len(fields)
-	if fieldCount != 3 {
+	if fieldCount != 2 {
 		t.Errorf("Wrong number of fields:%v", fieldCount)
 	}
 
@@ -245,13 +240,13 @@ component AnotherComponent
 func TestTypeInsteadOfComponent(t *testing.T) {
 	parser, err := setup(
 		`
-component SomeOtherComponent
+component SomeOtherComponent [priority "high"]
   something Integer
 
 archetype ThisISTheEntity2
   lod 0
-    WorldPosition  [range   "0-122"]
-    SomeOtherComponent
+    WorldPosition  [range   "0-122", priority "low"]
+    SomeOtherComponent [priority "mid"]
   lod 1
     WorldPosition  [range   "0-122"]
 `)
@@ -261,10 +256,28 @@ archetype ThisISTheEntity2
 	}
 
 	def := parser.Root()
+
+	firstComponent := def.ComponentDataTypes()[0]
+	if firstComponent.Name() != "SomeOtherComponent" {
+		t.Errorf("wrong component name:%v", firstComponent)
+	}
+
+	firstMeta := firstComponent.Meta()
+	firstPriority := firstMeta.Field("priority")
+	if firstPriority != "high" {
+		t.Errorf("wrong priority %v", firstMeta)
+	}
+
 	archetypeToTest := def.Archetypes()[0]
 	firstLod := archetypeToTest.HighestLevelOfDetail()
 	secondComponentData := firstLod.EntityArchetypeItem(1)
 	raw := secondComponentData.Name()
+
+	secondItemInFirstLod := firstLod.Items()[1]
+	secondItemMeta := secondItemInFirstLod.Meta()
+	if secondItemMeta.Field("priority") != "mid" {
+		t.Errorf("wrong priority :%v", secondItemMeta)
+	}
 
 	if raw != "SomeOtherComponent" {
 		t.Errorf("wrong type %v", raw)

@@ -32,10 +32,11 @@ type ComponentDataType struct {
 	name   string
 	index  uint8
 	fields []*Field
+	meta   MetaData
 }
 
-func NewComponentDataType(name string, index uint8, fields []*Field) *ComponentDataType {
-	return &ComponentDataType{name: name, index: index, fields: fields}
+func NewComponentDataType(name string, index uint8, fields []*Field, meta MetaData) *ComponentDataType {
+	return &ComponentDataType{name: name, index: index, fields: fields, meta: meta}
 }
 
 func (c *ComponentDataType) Name() string {
@@ -48,6 +49,10 @@ func (c *ComponentDataType) Index() uint8 {
 
 func (c *ComponentDataType) Fields() []*Field {
 	return c.fields
+}
+
+func (c *ComponentDataType) Meta() MetaData {
+	return c.meta
 }
 
 func (c *ComponentDataType) String() string {

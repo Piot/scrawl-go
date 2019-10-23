@@ -32,6 +32,10 @@ type MetaData struct {
 	Values map[string]string
 }
 
+func (m *MetaData) IsNil() bool {
+	return m.Values == nil
+}
+
 func (m *MetaData) Int(name string) (int, error) {
 	s := m.Values[name]
 	return strconv.Atoi(s)
@@ -43,4 +47,8 @@ func (m *MetaData) IntWithDefault(name string, defaultValue int) (int, error) {
 		return defaultValue, nil
 	}
 	return strconv.Atoi(s)
+}
+
+func (m *MetaData) Field(name string) string {
+	return m.Values[name]
 }

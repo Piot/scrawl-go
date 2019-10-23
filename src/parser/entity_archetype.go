@@ -36,7 +36,7 @@ import (
 func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
 	validComponentTypes []string) (*definition.EntityArchetype, error) {
 
-	name, nameErr := p.parseArchetypeNameAndStartScope()
+	name, meta, nameErr := p.parseArchetypeNameAndStartScope()
 	if nameErr != nil {
 		return nil, nameErr
 	}
@@ -77,6 +77,6 @@ func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex,
 		expectedLevel++
 	}
 
-	entity := definition.NewEntityArchetype(name, entityIndex, lods)
+	entity := definition.NewEntityArchetype(name, entityIndex, lods, meta)
 	return entity, nil
 }

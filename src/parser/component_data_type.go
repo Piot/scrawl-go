@@ -29,10 +29,12 @@ package parser
 import "github.com/piot/scrawl-go/src/definition"
 
 func (p *Parser) parseComponentDataType(index uint8) (*definition.ComponentDataType, error) {
-	name, fields, err := p.parseNameAndFields()
+	name, meta, fields, err := p.parseNameOptionalMetaAndFields()
 	if err != nil {
 		return nil, err
 	}
-	component := definition.NewComponentDataType(name, index, fields)
+
+	component := definition.NewComponentDataType(name, index, fields, meta)
+
 	return component, nil
 }

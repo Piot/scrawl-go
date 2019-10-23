@@ -29,7 +29,7 @@ package parser
 import "github.com/piot/scrawl-go/src/definition"
 
 func (p *Parser) parseUserType() (*definition.UserType, error) {
-	name, fields, err := p.parseNameAndFields()
+	name, _, fields, err := p.parseNameOptionalMetaAndFields()
 	if err != nil {
 		return nil, err
 	}
