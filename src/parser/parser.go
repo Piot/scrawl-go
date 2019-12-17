@@ -135,6 +135,10 @@ func (p *Parser) next() (bool, error) {
 			return false, fmt.Errorf("Unknown keyword %v", symbolToken)
 		}
 	} else {
+		_, isEndOfLine := t.(token.LineDelimiterToken)
+		if isEndOfLine {
+			return p.next()
+		}
 		return false, fmt.Errorf("Unexpected token: %v", t)
 	}
 	return false, nil

@@ -163,6 +163,29 @@ component EmptyComponent
 	}
 }
 
+func TestCommentLines(t *testing.T) {
+	setup, err := setup(
+		`
+component EmptyComponent 
+  speed Float # this is a comment that should be ignored
+
+# Ignore this
+# and this
+
+`)
+	if err != nil {
+		t.Error(err)
+	}
+	components := setup.Root().ComponentDataTypes()
+	if len(components) != 1 {
+		t.Errorf("Should have been 1")
+	}
+
+	if components[0].Name() != "EmptyComponent" {
+		t.Errorf("Wrong name")
+	}
+}
+
 func TestEverything(t *testing.T) {
 	parser, err := setup(
 		`
