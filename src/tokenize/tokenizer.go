@@ -96,7 +96,7 @@ func (t *Tokenizer) parseComment() (token.Token, error) {
 	for true {
 		ch := t.nextRune()
 		if isNewLine(ch) {
-			t.unreadRune()
+			t.parseNewLine()
 			break
 		}
 		a += string(ch)
@@ -188,7 +188,7 @@ func (t *Tokenizer) ReadNext() (token.Token, error) {
 	if err != nil {
 		return nil, TokenizerError{err: err, position: t.position}
 	}
-	//fmt.Printf("return: %v\n", token)
+	// fmt.Printf("return: %v\n", token)
 	return token, nil
 }
 

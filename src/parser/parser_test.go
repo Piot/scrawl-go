@@ -102,6 +102,47 @@ func TestIgnoringCarriageReturn(t *testing.T) {
 	}
 }
 
+func TestEmptyComponent(t *testing.T) {
+	setup, err := setup(
+		`
+component EmptyComponent 
+  # Intentionally empty 
+`)
+	if err != nil {
+		t.Error(err)
+	}
+	components := setup.Root().ComponentDataTypes()
+	if len(components) != 1 {
+		t.Errorf("Should have been 1")
+	}
+
+	if components[0].Name() != "EmptyComponent" {
+		t.Errorf("Wrong name")
+	}
+}
+
+func TestAnotherEmptyComponent(t *testing.T) {
+	setup, err := setup(
+		`
+component EmptyComponent 
+  # Intentionally empty
+
+component SomethingElse
+  # Empty
+`)
+	if err != nil {
+		t.Error(err)
+	}
+	components := setup.Root().ComponentDataTypes()
+	if len(components) != 1 {
+		t.Errorf("Should have been 1")
+	}
+
+	if components[0].Name() != "EmptyComponent" {
+		t.Errorf("Wrong name")
+	}
+}
+
 func TestEverything(t *testing.T) {
 	parser, err := setup(
 		`
@@ -110,7 +151,7 @@ type SomeType
   type   Another
 
 component AnotherComponent
-  usingTheType int [range "34-45", debug "hello world"]
+  usingTheType int [range '34-45', debug 'hello world']
   Name string
 
 archetype ThisISTheEntity2

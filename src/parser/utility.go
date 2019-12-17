@@ -121,6 +121,7 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 		if tokenErr != nil {
 			return nil, tokenErr
 		}
+
 		symbolToken, wasSymbol := t.(token.SymbolToken)
 		if !wasSymbol {
 			_, wasEndScope := t.(token.EndScopeToken)
