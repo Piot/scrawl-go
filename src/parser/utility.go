@@ -122,6 +122,11 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 			return nil, tokenErr
 		}
 
+		_, wasEmptyLine := t.(token.LineDelimiterToken)
+		if wasEmptyLine {
+			continue
+		}
+
 		symbolToken, wasSymbol := t.(token.SymbolToken)
 		if !wasSymbol {
 			_, wasEndScope := t.(token.EndScopeToken)
@@ -175,9 +180,10 @@ func (p *Parser) readMetaOrNewline() (definition.MetaData, bool, error) {
 			return definition.MetaData{}, false, hopefullyLineDelimiterErr
 		}
 	}
-	token, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
-	if !wasEndOfLine {
-		return definition.MetaData{}, false, fmt.Errorf("must end lines or have meta information:%v", token)
+	_, wasEndOfLine := hopefullyLineDelimiter.(token.LineDelimiterToken)
+	_, wasEndOfScope := hopefullyLineDelimiter.(token.EndScopeToken)
+	if !wasEndOfLine && !wasEndOfScope {
+		return definition.MetaData{}, false, fmt.Errorf("must end lines or have meta information:%v", hopefullyLineDelimiter)
 	}
 
 	return metaData, !isStartMeta, nil

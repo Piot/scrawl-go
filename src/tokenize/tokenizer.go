@@ -96,7 +96,8 @@ func (t *Tokenizer) parseComment() (token.Token, error) {
 	for true {
 		ch := t.nextRune()
 		if isNewLine(ch) {
-			t.parseNewLine()
+			t.unreadRune()
+			t.lastTokenWasDelimiter = false
 			break
 		}
 		a += string(ch)
@@ -126,6 +127,7 @@ func (t *Tokenizer) parseNewLine() (token.Token, error) {
 	if indentationErr != nil {
 		return nil, indentationErr
 	}
+	//fmt.Printf("indentation:%v target:%v\n", indentation, t.targetIndentation)
 	if indentation == -1 {
 		return t.internalReadNext()
 	}
@@ -133,6 +135,7 @@ func (t *Tokenizer) parseNewLine() (token.Token, error) {
 		return nil, fmt.Errorf("Too much indentation")
 	}
 	t.targetIndentation = indentation
+	//fmt.Printf("indentation after:%v target:%v\n", t.indentation, t.targetIndentation)
 	if t.indentation >= t.targetIndentation && !t.lastTokenWasDelimiter {
 		t.lastTokenWasDelimiter = true
 		return token.NewLineDelimiter(t.position), nil
@@ -188,7 +191,7 @@ func (t *Tokenizer) ReadNext() (token.Token, error) {
 	if err != nil {
 		return nil, TokenizerError{err: err, position: t.position}
 	}
-	// fmt.Printf("return: %v\n", token)
+	//fmt.Printf("return: %v\n", token)
 	return token, nil
 }
 

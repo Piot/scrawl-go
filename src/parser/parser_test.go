@@ -134,6 +134,26 @@ component SomethingElse
 		t.Error(err)
 	}
 	components := setup.Root().ComponentDataTypes()
+	if len(components) != 2 {
+		t.Errorf("Should have been 2")
+	}
+
+	if components[0].Name() != "EmptyComponent" {
+		t.Errorf("Wrong name")
+	}
+}
+
+func TestCommentField(t *testing.T) {
+	setup, err := setup(
+		`
+component EmptyComponent 
+  speed Float # this is a comment that should be ignored
+
+`)
+	if err != nil {
+		t.Error(err)
+	}
+	components := setup.Root().ComponentDataTypes()
 	if len(components) != 1 {
 		t.Errorf("Should have been 1")
 	}
