@@ -48,11 +48,12 @@ func (f ParserError) Error() string {
 }
 
 type Parser struct {
-	tokenizer           *tokenize.Tokenizer
-	root                *definition.Root
-	lastToken           token.Token
-	lastEntity          *definition.EntityArchetype
-	validComponentTypes []string
+	tokenizer            *tokenize.Tokenizer
+	root                 *definition.Root
+	lastToken            token.Token
+	lastEntity           *definition.EntityArchetype
+	validComponentTypes  []string
+	validComponentFields []string
 }
 
 func (p *Parser) readNextEvenComments() (token.Token, error) {
@@ -169,9 +170,10 @@ func setHash(root *definition.Root, text string) error {
 	return nil
 }
 
-func NewParser(text string, allowedComponentTypes []string) (*Parser, error) {
+func NewParser(text string, allowedComponentFields []string, allowedComponentTypes []string) (*Parser, error) {
 	tokenizer := tokenize.SetupTokenizer(text)
-	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes}
+	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes,
+		validComponentFields: allowedComponentFields}
 	done := false
 	var err error
 	err = nil

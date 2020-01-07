@@ -37,7 +37,7 @@ func (p *Parser) parseEntityArchetypeItem(index int, itemTypeString string) (*de
 		return nil, metaErr
 	}
 
-	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentTypes,
+	archetypeItem, archetypeItemErr := convertEntityArchetypeItem(p.root, p.validComponentFields, p.validComponentTypes,
 		itemTypeString, index, meta)
 
 	return archetypeItem, archetypeItemErr

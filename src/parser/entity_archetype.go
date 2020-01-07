@@ -63,7 +63,7 @@ func (p *Parser) parseEntityArchetype(entityIndex definition.EntityIndex) (*defi
 			return nil, fmt.Errorf("expected 'lod' %v", symbol)
 		}
 
-		lod, err := p.parseLod(p.validComponentTypes)
+		lod, err := p.parseLod(p.validComponentFields, p.validComponentTypes)
 		if err != nil {
 			return nil, err
 		}

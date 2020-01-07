@@ -144,11 +144,18 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 	}
 }
 
-func convertEntityArchetypeItem(root *definition.Root, validComponentTypes []string, typeName string, itemIndex int, meta definition.MetaData) (*definition.EntityArchetypeItem, error) {
+func convertEntityArchetypeItem(root *definition.Root, validComponentFields []string, validComponentTypes []string,
+	typeName string, itemIndex int, meta definition.MetaData) (*definition.EntityArchetypeItem, error) {
 	componentDataTypeReference := root.FindComponentDataType(typeName)
 	var archetypeItem *definition.EntityArchetypeItem
 	if componentDataTypeReference == nil {
-		if !Contains(validComponentTypes, typeName) {
+		if Contains(validComponentTypes, typeName) {
+			componentDataTypeReference = definition.NewComponentDataType(typeName, 0xff, nil, definition.MetaData{})
+		}
+	}
+
+	if componentDataTypeReference == nil {
+		if !Contains(validComponentFields, typeName) {
 			return nil, fmt.Errorf("unknown component type:%v", typeName)
 		}
 		archetypeItem = definition.NewEntityArchetypeItemUsingFieldType(itemIndex, typeName, meta)

@@ -30,7 +30,7 @@ import (
 	"github.com/piot/scrawl-go/src/definition"
 )
 
-func (p *Parser) parseLod(validComponentTypes []string) (*definition.EntityArchetypeLOD, error) {
+func (p *Parser) parseLod(validComponentFields []string, validComponentTypes []string) (*definition.EntityArchetypeLOD, error) {
 	lodLevel, err := p.parseIntegerAndStartScope()
 	if err != nil {
 		return nil, err

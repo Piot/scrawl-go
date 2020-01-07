@@ -31,7 +31,7 @@ import (
 )
 
 func setup(x string) (*Parser, error) {
-	return NewParser(x, []string{"WorldPosition"})
+	return NewParser(x, []string{"WorldPosition"}, []string{"WorldPositionComponent"})
 }
 
 func TestIndentationSymbol(t *testing.T) {

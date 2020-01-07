@@ -92,7 +92,7 @@ func run() error {
 	if protocolDefinitionFilename == "" {
 		return fmt.Errorf("Must specify a protocol file")
 	}
-	root, rootErr := scrawl.ParseFile(protocolDefinitionFilename, []string{"WorldPosition"})
+	root, rootErr := scrawl.ParseFile(protocolDefinitionFilename, []string{"WorldPosition"}, []string{"WorldPositionComponent"})
 	if rootErr != nil {
 		return rootErr
 	}
