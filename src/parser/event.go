@@ -29,9 +29,10 @@ package parser
 import "github.com/piot/scrawl-go/src/definition"
 
 func (p *Parser) parseEvent() (*definition.Event, error) {
-	archetype, archetypeErr := p.parseGenericArchetype()
-	if archetypeErr != nil {
-		return nil, archetypeErr
+	name, meta, fields, err := p.parseNameOptionalMetaAndFields()
+	if err != nil {
+		return nil, err
 	}
-	return definition.NewEvent(archetype), nil
+
+	return definition.NewEvent(name, meta, fields), nil
 }

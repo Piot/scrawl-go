@@ -202,13 +202,14 @@ archetype ThisISTheEntity2
     AnotherComponent
 
 event Jump
-  WorldPosition
+  hello int32
+
+command Fire
+  target String
 
 type ReturnType
   hello	 int32
   type   Another
-
-command CommandName SomeType ReturnType
 `)
 
 	if err != nil {
@@ -221,9 +222,20 @@ command CommandName SomeType ReturnType
 	}
 
 	event := def.Events()[0]
-	if event.Archetype().Name() != "Jump" {
+	if event.Name() != "Jump" {
 		t.Errorf("Wrong event name:%v", event)
 	}
+
+	cmd := def.Commands()[0]
+	if cmd.Name() != "Fire" {
+		t.Errorf("Wrong command name:%v", event)
+	}
+
+	cmdField := cmd.Fields()[0]
+	if cmdField.FieldType() != "String" {
+		t.Errorf("Wrong command field:%v", cmdField)
+	}
+
 	firstComponent := def.ComponentDataTypes()[0]
 	firstComponentName := firstComponent.Name()
 	if firstComponentName != "AnotherComponent" {
@@ -255,19 +267,6 @@ command CommandName SomeType ReturnType
 	}
 	if fields[1].FieldType() != "string" {
 		t.Errorf("Wrong field name:%v", fields[1].FieldType())
-	}
-
-	cmd := def.Commands()[0]
-	if cmd.Name() != "CommandName" {
-		t.Errorf("wrong command name %v", cmd)
-	}
-
-	if cmd.ParameterTypeName() != "SomeType" {
-		t.Errorf("Wrong argument type %v", cmd)
-	}
-
-	if cmd.ReturnTypeName() != "ReturnType" {
-		t.Errorf("wrong command return %v", cmd)
 	}
 }
 

@@ -26,36 +26,34 @@ SOFTWARE.
 
 package definition
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Command struct {
-	name       string
-	parameter  string
-	returnType string
-	index      CommandTypeIndex
+	name   string
+	meta   MetaData
+	fields []*Field
 }
 
-func NewCommand(index CommandTypeIndex, name string, parameter string, returnType string) *Command {
-	return &Command{index: index, name: name, parameter: parameter, returnType: returnType}
+func NewCommand(name string, meta MetaData, fields []*Field) *Command {
+	return &Command{name: name, meta: meta, fields: fields}
 }
 
-func (c *Command) TypeIndex() CommandTypeIndex {
-	return c.index
-}
-func (c *Command) Name() string {
-	return c.name
+func (e *Command) Name() string {
+	return e.name
 }
 
-func (c *Command) ReturnTypeName() string {
-	return c.returnType
+func (e *Command) Meta() MetaData {
+	return e.meta
 }
 
-func (c *Command) ParameterTypeName() string {
-	return c.parameter
+func (e *Command) Fields() []*Field {
+	return e.fields
 }
 
-func (c *Command) String() string {
-	return fmt.Sprintf("[command %d:'%v'(%v) %v]", c.index, c.name, c.parameter, c.returnType)
+func (e *Command) String() string {
+	var s string
+
+	s += fmt.Sprintf("[event %v]", e.fields)
+
+	return s
 }
