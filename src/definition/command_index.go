@@ -31,18 +31,12 @@ import (
 )
 
 // CommandTypeIndex :
-type CommandTypeIndex struct {
-	id uint8
-}
-
-func (e CommandTypeIndex) Value() uint8 {
-	return e.id
-}
+type CommandTypeIndex uint8
 
 func (e CommandTypeIndex) String() string {
-	return fmt.Sprintf("[command-type-index %v]", e.id)
+	return fmt.Sprintf("[command-type-index %d]", e)
 }
 
 func NewCommandTypeIndex(index int) CommandTypeIndex {
-	return CommandTypeIndex{id: uint8(index)}
+	return CommandTypeIndex(uint8(index))
 }

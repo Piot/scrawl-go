@@ -32,10 +32,15 @@ type Command struct {
 	name   string
 	meta   MetaData
 	fields []*Field
+	id     CommandTypeIndex
 }
 
-func NewCommand(name string, meta MetaData, fields []*Field) *Command {
-	return &Command{name: name, meta: meta, fields: fields}
+func NewCommand(id CommandTypeIndex, name string, meta MetaData, fields []*Field) *Command {
+	return &Command{id: id, name: name, meta: meta, fields: fields}
+}
+
+func (e *Command) TypeIndex() CommandTypeIndex {
+	return e.id
 }
 
 func (e *Command) Name() string {

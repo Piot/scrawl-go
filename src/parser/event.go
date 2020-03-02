@@ -28,11 +28,11 @@ package parser
 
 import "github.com/piot/scrawl-go/src/definition"
 
-func (p *Parser) parseEvent() (*definition.Event, error) {
+func (p *Parser) parseEvent(id definition.EventTypeIndex) (*definition.Event, error) {
 	name, meta, fields, err := p.parseNameOptionalMetaAndFields()
 	if err != nil {
 		return nil, err
 	}
 
-	return definition.NewEvent(name, meta, fields), nil
+	return definition.NewEvent(id, name, meta, fields), nil
 }

@@ -24,17 +24,19 @@ SOFTWARE.
 
 */
 
-package parser
+package definition
 
 import (
-	"github.com/piot/scrawl-go/src/definition"
+	"fmt"
 )
 
-func (p *Parser) parseCommand(index definition.CommandTypeIndex) (*definition.Command, error) {
-	name, meta, fields, err := p.parseNameOptionalMetaAndFields()
-	if err != nil {
-		return nil, err
-	}
+// EventTypeIndex :
+type EventTypeIndex uint8
 
-	return definition.NewCommand(index, name, meta, fields), nil
+func (e EventTypeIndex) String() string {
+	return fmt.Sprintf("[event-type-index %d]", e)
+}
+
+func NewEventTypeIndex(index int) EventTypeIndex {
+	return EventTypeIndex(uint8(index))
 }

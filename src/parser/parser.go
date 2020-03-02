@@ -113,17 +113,23 @@ func (p *Parser) next() (bool, error) {
 			p.root.AddArchetype(entity)
 			p.lastEntity = entity
 		case "event":
-			event, err := p.parseEvent()
-			if err != nil {
-				return false, err
+			{
+				eventIndex := definition.NewEventTypeIndex(len(p.root.Events()))
+				event, err := p.parseEvent(eventIndex)
+				if err != nil {
+					return false, err
+				}
+				p.root.AddEvent(event)
 			}
-			p.root.AddEvent(event)
 		case "command":
-			method, err := p.parseCommand(definition.NewCommandTypeIndex(len(p.root.Commands())))
-			if err != nil {
-				return false, err
+			{
+				commandIndex := definition.NewCommandTypeIndex(len(p.root.Commands()))
+				method, err := p.parseCommand(commandIndex)
+				if err != nil {
+					return false, err
+				}
+				p.root.AddMethod(method)
 			}
-			p.root.AddMethod(method)
 		case "enum":
 			enum, err := p.parseEnum()
 			if err != nil {
