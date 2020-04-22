@@ -89,6 +89,12 @@ func (p *Parser) next() (bool, error) {
 	symbolToken, wasSymbol := t.(token.SymbolToken)
 	if wasSymbol {
 		switch symbolToken.Symbol {
+		case "namespace":
+			namespace, namespaceErr := p.parseNamespace()
+			if namespaceErr != nil {
+				return false, namespaceErr
+			}
+			p.root.SetNamespace(namespace)
 		case "component":
 			index := uint8(len(p.root.ComponentDataTypes()))
 			component, err := p.parseComponentDataType(index)

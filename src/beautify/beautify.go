@@ -19,6 +19,12 @@ func (o *OutputStream) writeSymbol(symbol token.SymbolToken) {
 	fmt.Fprintf(o.writer, "%v", symbol.Symbol)
 	o.col++
 }
+
+func (o *OutputStream) writeOperator(symbol token.OperatorToken) {
+	fmt.Fprintf(o.writer, "%v", symbol.Operator)
+	o.col++
+}
+
 func (o *OutputStream) writeString(stringToken token.StringToken) {
 	fmt.Fprintf(o.writer, "'%v'", stringToken.Text())
 	o.col++
@@ -112,6 +118,12 @@ func writeToken(o *OutputStream, tok token.Token) {
 	numberToken, wasNumber := tok.(token.NumberToken)
 	if wasNumber {
 		o.writeNumber(numberToken)
+		return
+	}
+
+	operatorToken, wasOperatorToken := tok.(token.OperatorToken)
+	if wasOperatorToken {
+		o.writeOperator(operatorToken)
 		return
 	}
 

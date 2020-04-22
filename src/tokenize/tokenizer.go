@@ -177,6 +177,8 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 			return token.NewEndMetaDataToken(t.position), nil
 		} else if r == ',' {
 			return t.internalReadNext()
+		} else if r == '.' {
+			return token.NewOperatorToken(r, t.position), nil
 		} else if r == '#' {
 			return t.parseComment()
 		} else if r == 0 {

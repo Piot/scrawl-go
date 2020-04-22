@@ -320,6 +320,28 @@ component AnotherComponent
 	}
 }
 
+func TestNamespace(t *testing.T) {
+	parser, err := setup(
+		`
+namespace Some.Namespace.Here
+
+archetype ThisISTheEntity2
+  lod 0
+    WorldPosition  [range   "0-122", priority "low"]
+  lod 1
+    WorldPosition  [range   "0-122"]
+`)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	def := parser.Root()
+	if def.Namespace() != "Some.Namespace.Here" {
+		t.Fatalf("wrong namespace")
+	}
+}
+
 func TestTypeInsteadOfComponent(t *testing.T) {
 	parser, err := setup(
 		`

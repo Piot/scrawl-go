@@ -40,10 +40,15 @@ type Root struct {
 	events             []*Event
 	enums              []*Enum
 	hash               Hash
+	namespace          string
 }
 
 func (r *Root) SetHash(hash Hash) {
 	r.hash = hash
+}
+
+func (r *Root) SetNamespace(namespace string) {
+	r.namespace = namespace
 }
 
 func (r *Root) Hash() Hash {
@@ -89,6 +94,10 @@ func (r *Root) String() string {
 	}
 
 	return s
+}
+
+func (r *Root) Namespace() string {
+	return r.namespace
 }
 
 func (r *Root) ComponentDataTypes() []*ComponentDataType {
