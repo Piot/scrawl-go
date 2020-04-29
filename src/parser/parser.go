@@ -95,6 +95,14 @@ func (p *Parser) next() (bool, error) {
 				return false, namespaceErr
 			}
 			p.root.SetNamespace(namespace)
+
+		case "name":
+			namespace, namespaceErr := p.parseName()
+			if namespaceErr != nil {
+				return false, namespaceErr
+			}
+			p.root.SetName(namespace)
+
 		case "component":
 			index := uint8(len(p.root.ComponentDataTypes()))
 			component, err := p.parseComponentDataType(index)

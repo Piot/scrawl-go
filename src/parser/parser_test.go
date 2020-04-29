@@ -342,6 +342,34 @@ archetype ThisISTheEntity2
 	}
 }
 
+func TestName(t *testing.T) {
+	parser, err := setup(
+		`
+name MyCoolName
+
+namespace Some.Namespace.Here
+
+archetype ThisISTheEntity2
+  lod 0
+    WorldPosition  [range   "0-122", priority "low"]
+  lod 1
+    WorldPosition  [range   "0-122"]
+`)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	def := parser.Root()
+	if def.Namespace() != "Some.Namespace.Here" {
+		t.Fatalf("wrong namespace")
+	}
+
+	if def.Name() != "MyCoolName" {
+		t.Fatalf("wrong name")
+	}
+}
+
 func TestTypeInsteadOfComponent(t *testing.T) {
 	parser, err := setup(
 		`
