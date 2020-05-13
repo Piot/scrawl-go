@@ -144,6 +144,16 @@ func (p *Parser) next() (bool, error) {
 				}
 				p.root.AddMethod(method)
 			}
+
+		case "buffer":
+			{
+				commandIndex := definition.NewBufferIndex(len(p.root.Buffers()))
+				method, err := p.parseBuffer(commandIndex)
+				if err != nil {
+					return false, err
+				}
+				p.root.AddBuffer(method)
+			}
 		case "enum":
 			enum, err := p.parseEnum()
 			if err != nil {

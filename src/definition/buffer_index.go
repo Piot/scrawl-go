@@ -26,39 +26,17 @@ SOFTWARE.
 
 package definition
 
-import "fmt"
+import (
+	"fmt"
+)
 
-type Command struct {
-	name   string
-	meta   MetaData
-	fields []*Field
-	id     CommandTypeIndex
+// BufferTypeIndex :
+type BufferTypeIndex uint8
+
+func (e BufferTypeIndex) String() string {
+	return fmt.Sprintf("[buffer-index %d]", e)
 }
 
-func NewCommand(id CommandTypeIndex, name string, meta MetaData, fields []*Field) *Command {
-	return &Command{id: id, name: name, meta: meta, fields: fields}
-}
-
-func (e *Command) TypeIndex() CommandTypeIndex {
-	return e.id
-}
-
-func (e *Command) Name() string {
-	return e.name
-}
-
-func (e *Command) Meta() MetaData {
-	return e.meta
-}
-
-func (e *Command) Fields() []*Field {
-	return e.fields
-}
-
-func (e *Command) String() string {
-	var s string
-
-	s += fmt.Sprintf("[command %v]", e.fields)
-
-	return s
+func NewBufferIndex(index int) BufferTypeIndex {
+	return BufferTypeIndex(uint8(index))
 }

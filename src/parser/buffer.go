@@ -24,41 +24,17 @@ SOFTWARE.
 
 */
 
-package definition
+package parser
 
-import "fmt"
+import (
+	"github.com/piot/scrawl-go/src/definition"
+)
 
-type Command struct {
-	name   string
-	meta   MetaData
-	fields []*Field
-	id     CommandTypeIndex
-}
+func (p *Parser) parseBuffer(index definition.BufferTypeIndex) (*definition.Buffer, error) {
+	name, meta, fields, err := p.parseNameOptionalMetaAndFields()
+	if err != nil {
+		return nil, err
+	}
 
-func NewCommand(id CommandTypeIndex, name string, meta MetaData, fields []*Field) *Command {
-	return &Command{id: id, name: name, meta: meta, fields: fields}
-}
-
-func (e *Command) TypeIndex() CommandTypeIndex {
-	return e.id
-}
-
-func (e *Command) Name() string {
-	return e.name
-}
-
-func (e *Command) Meta() MetaData {
-	return e.meta
-}
-
-func (e *Command) Fields() []*Field {
-	return e.fields
-}
-
-func (e *Command) String() string {
-	var s string
-
-	s += fmt.Sprintf("[command %v]", e.fields)
-
-	return s
+	return definition.NewBuffer(definition.BufferTypeIndex(index), name, meta, fields), nil
 }

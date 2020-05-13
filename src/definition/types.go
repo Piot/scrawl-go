@@ -34,6 +34,7 @@ type Hash uint32
 
 type Root struct {
 	componentDataTypes []*ComponentDataType
+	buffers            []*Buffer
 	userTypes          []*UserType
 	archetypes         []*EntityArchetype
 	commands           []*Command
@@ -125,6 +126,10 @@ func (r *Root) Commands() []*Command {
 	return r.commands
 }
 
+func (r *Root) Buffers() []*Buffer {
+	return r.buffers
+}
+
 func (r *Root) Archetypes() []*EntityArchetype {
 	return r.archetypes
 }
@@ -151,6 +156,10 @@ func (r *Root) AddEvent(c *Event) {
 
 func (r *Root) AddMethod(c *Command) {
 	r.commands = append(r.commands, c)
+}
+
+func (r *Root) AddBuffer(c *Buffer) {
+	r.buffers = append(r.buffers, c)
 }
 
 func (r *Root) AddEnum(c *Enum) {

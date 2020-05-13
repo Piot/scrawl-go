@@ -207,6 +207,9 @@ event Jump
 command Fire
   target String
 
+buffer Tile
+  index int32
+
 type ReturnType
   hello	 int32
   type   Another
@@ -236,6 +239,15 @@ type ReturnType
 		t.Errorf("Wrong command field:%v", cmdField)
 	}
 
+	buffer := def.Buffers()[0]
+	if buffer.Name() != "Tile" {
+		t.Errorf("wrong buffer %v", buffer)
+	}
+
+	bufferField := buffer.Fields()[0]
+	if bufferField.FieldType() != "int32" {
+		t.Errorf("wrong field type for buffer %v", bufferField.FieldType())
+	}
 	firstComponent := def.ComponentDataTypes()[0]
 	firstComponentName := firstComponent.Name()
 	if firstComponentName != "AnotherComponent" {

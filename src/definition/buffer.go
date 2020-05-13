@@ -28,37 +28,37 @@ package definition
 
 import "fmt"
 
-type Command struct {
+type Buffer struct {
 	name   string
 	meta   MetaData
 	fields []*Field
-	id     CommandTypeIndex
+	id     BufferTypeIndex
 }
 
-func NewCommand(id CommandTypeIndex, name string, meta MetaData, fields []*Field) *Command {
-	return &Command{id: id, name: name, meta: meta, fields: fields}
+func NewBuffer(id BufferTypeIndex, name string, meta MetaData, fields []*Field) *Buffer {
+	return &Buffer{id: id, name: name, meta: meta, fields: fields}
 }
 
-func (e *Command) TypeIndex() CommandTypeIndex {
+func (e *Buffer) TypeIndex() BufferTypeIndex {
 	return e.id
 }
 
-func (e *Command) Name() string {
+func (e *Buffer) Name() string {
 	return e.name
 }
 
-func (e *Command) Meta() MetaData {
+func (e *Buffer) Meta() MetaData {
 	return e.meta
 }
 
-func (e *Command) Fields() []*Field {
+func (e *Buffer) Fields() []*Field {
 	return e.fields
 }
 
-func (e *Command) String() string {
+func (e *Buffer) String() string {
 	var s string
 
-	s += fmt.Sprintf("[command %v]", e.fields)
+	s += fmt.Sprintf("[buffer %v]", e.fields)
 
 	return s
 }
