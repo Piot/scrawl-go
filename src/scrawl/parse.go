@@ -50,3 +50,12 @@ func ParseString(text string, allowedComponentFields []string, allowedComponentT
 
 	return parser.Root(), nil
 }
+
+func ParseToRoot(r *definition.Root, text string, allowedComponentFields []string, allowedComponentTypes []string) (*parser.Parser, error) {
+	parser, parserErr := parser.NewParser(text, allowedComponentFields, allowedComponentTypes)
+	if parserErr != nil {
+		return nil, parserErr
+	}
+
+	return parser, nil
+}
