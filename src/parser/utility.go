@@ -34,10 +34,15 @@ import (
 )
 
 func (p *Parser) parseNameOptionalMetaAndFields() (string, definition.MetaData, []*definition.Field, error) {
-	name, meta, nameErr := p.parseNameOptionalMetaAndStartScope()
+	name, meta, wasStartScope, nameErr := p.parseNameOptionalMetaAndStartScope()
 	if nameErr != nil {
 		return "", definition.MetaData{}, nil, nameErr
 	}
+
+	if !wasStartScope {
+		return name, meta, nil, nil
+	}
+
 	fields, fieldsErr := p.parseFieldsUntilEndScope()
 	if fieldsErr != nil {
 		return "", definition.MetaData{}, nil, fieldsErr
@@ -46,7 +51,7 @@ func (p *Parser) parseNameOptionalMetaAndFields() (string, definition.MetaData, 
 }
 
 func (p *Parser) parseArchetypeNameAndStartScope() (string, definition.MetaData, error) {
-	name, meta, nameErr := p.parseNameOptionalMetaAndStartScope()
+	name, meta, _, nameErr := p.parseNameOptionalMetaAndStartScope()
 	if nameErr != nil {
 		return "", definition.MetaData{}, nameErr
 	}
@@ -78,15 +83,15 @@ func (p *Parser) parseIntegerAndStartScope() (int, error) {
 	return number, nil
 }
 
-func (p *Parser) parseNameOptionalMetaAndStartScope() (string, definition.MetaData, error) {
+func (p *Parser) parseNameOptionalMetaAndStartScope() (string, definition.MetaData, bool, error) {
 	name, symbolErr := p.parseSymbol()
 	if symbolErr != nil {
-		return "", definition.MetaData{}, symbolErr
+		return "", definition.MetaData{}, false, symbolErr
 	}
 
 	maybeMetaOrStartScope, tokErr := p.readNext()
 	if tokErr != nil {
-		return "", definition.MetaData{}, tokErr
+		return "", definition.MetaData{}, false, tokErr
 	}
 
 	_, isStartMeta := maybeMetaOrStartScope.(token.StartMetaDataToken)
@@ -98,19 +103,17 @@ func (p *Parser) parseNameOptionalMetaAndStartScope() (string, definition.MetaDa
 
 		metaData, metaDataErr = p.parseMetaData()
 		if metaDataErr != nil {
-			return "", definition.MetaData{}, metaDataErr
+			return "", definition.MetaData{}, false, metaDataErr
 		}
 		maybeMetaOrStartScope, metaDataErr = p.readNext()
 		if metaDataErr != nil {
-			return "", definition.MetaData{}, metaDataErr
+			return "", definition.MetaData{}, false, metaDataErr
 		}
 	}
-	_, wasStartScope := maybeMetaOrStartScope.(token.StartScopeToken)
-	if !wasStartScope {
-		return "", definition.MetaData{}, fmt.Errorf("needs to have start scope after archetype name")
-	}
 
-	return name, metaData, nil
+	_, wasStartScope := maybeMetaOrStartScope.(token.StartScopeToken)
+
+	return name, metaData, wasStartScope, nil
 }
 
 func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
@@ -122,6 +125,9 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 			return nil, tokenErr
 		}
 
+		if t == nil {
+			return fields, nil
+		}
 		_, wasEmptyLine := t.(token.LineDelimiterToken)
 		if wasEmptyLine {
 			continue
@@ -133,7 +139,7 @@ func (p *Parser) parseFieldsUntilEndScope() ([]*definition.Field, error) {
 			if wasEndScope {
 				return fields, nil
 			}
-			return nil, fmt.Errorf("Expected fieldname or end of scope")
+			return nil, fmt.Errorf("Expected fieldname or end of scope %T %v", t, t)
 		}
 
 		parsedField, parseFieldErr := p.parseField(len(fields), symbolToken.Symbol)

@@ -28,6 +28,8 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/piot/scrawl-go/src/definition"
 )
 
 func setup(x string) (*Parser, error) {
@@ -452,4 +454,40 @@ component AnotherComponent
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func checkEmptyComponent(t *testing.T, d *definition.Root, name string) {
+	emptyComponent := d.FindComponentDataType(name)
+	if emptyComponent == nil {
+		t.Fatalf("needs component '%v'", name)
+	}
+	fieldCount := len(emptyComponent.Fields())
+	if fieldCount != 0 {
+		t.Fatalf("component needs to be empty '%v'", name)
+	}
+}
+
+func TestComponentsWithoutFields(t *testing.T) {
+	d, err := setup(
+		`
+component AnotherComponent
+  usingTheType int [range "34-45", debug "hello world"]
+
+component EmptyComponent
+
+component AnotherSignalComponent
+  # not here
+
+component YetAnotherComponent
+  usingTheType int [range "34-45", debug "hello world"]
+
+  # This is a comment`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	root := d.root
+
+	checkEmptyComponent(t, root, "EmptyComponent")
+	checkEmptyComponent(t, root, "AnotherSignalComponent")
 }

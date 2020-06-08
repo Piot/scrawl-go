@@ -199,9 +199,9 @@ func setHash(root *definition.Root, text string) error {
 	return nil
 }
 
-func NewParser(text string, allowedComponentFields []string, allowedComponentTypes []string) (*Parser, error) {
+func ParseToRoot(root *definition.Root, text string, allowedComponentFields []string, allowedComponentTypes []string) (*Parser, error) {
 	tokenizer := tokenize.SetupTokenizer(text)
-	parser := &Parser{tokenizer: tokenizer, root: &definition.Root{}, validComponentTypes: allowedComponentTypes,
+	parser := &Parser{tokenizer: tokenizer, root: root, validComponentTypes: allowedComponentTypes,
 		validComponentFields: allowedComponentFields}
 	done := false
 	var err error
@@ -232,4 +232,8 @@ func NewParser(text string, allowedComponentFields []string, allowedComponentTyp
 	}
 
 	return parser, nil
+}
+
+func NewParser(text string, allowedComponentFields []string, allowedComponentTypes []string) (*Parser, error) {
+	return ParseToRoot(&definition.Root{}, text, allowedComponentFields, allowedComponentTypes)
 }
