@@ -435,3 +435,21 @@ archetype ThisISTheEntity2
 		t.Errorf("wrong type %v", raw2)
 	}
 }
+
+func TestCommentAtEnd(t *testing.T) {
+	_, err := setup(
+		`
+enum MovementState 
+  Attacking 1
+  Idle 0
+
+component AnotherComponent
+  usingTheType int [range "34-45", debug "hello world"]
+  Name string
+  state MovementState
+
+# This is a comment`)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

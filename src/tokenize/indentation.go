@@ -30,26 +30,33 @@ import "fmt"
 
 func (t *Tokenizer) parseIndentation() (int, error) {
 	indentation := 0
-	for true {
+
+	for {
 		ch := t.nextRune()
 		if !isIndentation(ch) {
 			if isIllegalDuringIndentation(ch) {
-				return 0, fmt.Errorf("Illegal indentation character: %c (%v)", ch, ch)
+				return 0, fmt.Errorf("illegal indentation character: %c (%v)", ch, ch)
 			}
+
 			t.unreadRune()
+
 			if isNewLine(ch) {
 				return -1, nil
 			}
-			if ch == 0 {
+
+			if isEndOfFile(ch) {
 				return 0, nil
 			}
+
 			break
 		}
-		indentation++
 
+		indentation++
 	}
+
 	if indentation%2 != 0 {
 		return 0, fmt.Errorf("Must have double spaces as indentation")
 	}
+
 	return indentation / 2, nil
 }
