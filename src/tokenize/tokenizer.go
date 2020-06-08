@@ -93,29 +93,36 @@ func (t *Tokenizer) unreadRune() {
 func (t *Tokenizer) parseComment() (token.Token, error) {
 	var a string
 	startPosition := t.position
-	for true {
+
+	for {
 		ch := t.nextRune()
-		if isNewLine(ch) {
+		if isNewLineLike(ch) {
 			t.unreadRune()
 			t.lastTokenWasDelimiter = false
+
 			break
 		}
 		a += string(ch)
 	}
+
 	a = strings.TrimSpace(a)
+
 	return token.NewCommentToken(a, startPosition), nil
 }
 
 func (t *Tokenizer) parseString(startStringRune rune) (token.Token, error) {
 	var a string
 	startPosition := t.position
-	for true {
+
+	for {
 		ch := t.nextRune()
+
 		if ch == startStringRune {
 			break
 		}
-		if ch == 0 {
-			return nil, fmt.Errorf("Unexpected end while finding end of string")
+
+		if isEndOfFile(ch) {
+			return nil, fmt.Errorf("unexpected end while finding end of string")
 		}
 		a += string(ch)
 	}
@@ -131,9 +138,11 @@ func (t *Tokenizer) parseNewLine() (token.Token, error) {
 	if indentation == -1 {
 		return t.internalReadNext()
 	}
+
 	if indentation > t.indentation+1 {
-		return nil, fmt.Errorf("Too much indentation")
+		return nil, fmt.Errorf("too much indentation")
 	}
+
 	t.targetIndentation = indentation
 	//fmt.Printf("indentation after:%v target:%v\n", t.indentation, t.targetIndentation)
 	if t.indentation >= t.targetIndentation && !t.lastTokenWasDelimiter {
@@ -156,6 +165,7 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 	}
 
 	r := t.nextRune()
+
 	if isNewLine(r) {
 		return t.parseNewLine()
 	} else {
@@ -163,6 +173,7 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 			return t.internalReadNext()
 		}
 		t.lastTokenWasDelimiter = false
+
 		if isLetter(r) {
 			t.unreadRune()
 			return t.parseSymbol()
@@ -181,7 +192,7 @@ func (t *Tokenizer) internalReadNext() (token.Token, error) {
 			return token.NewOperatorToken(r, t.position), nil
 		} else if r == '#' {
 			return t.parseComment()
-		} else if r == 0 {
+		} else if isEndOfFile(r) {
 			return nil, nil
 		}
 	}
@@ -199,14 +210,17 @@ func (t *Tokenizer) ReadNext() (token.Token, error) {
 
 func (t *Tokenizer) ReadAll() ([]token.Token, error) {
 	var tokens []token.Token
+
 	for {
 		tok, tokErr := t.ReadNext()
 		if tokErr != nil {
 			return nil, tokErr
 		}
+
 		if tok == nil {
 			break
 		}
+
 		tokens = append(tokens, tok)
 	}
 

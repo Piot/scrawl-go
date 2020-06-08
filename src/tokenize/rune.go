@@ -34,6 +34,14 @@ func isNewLine(ch rune) bool {
 	return ch == '\n'
 }
 
+func isEndOfFile(ch rune) bool {
+	return ch == 0
+}
+
+func isNewLineLike(ch rune) bool {
+	return ch == '\n' || ch == 0
+}
+
 func isLetter(ch rune) bool {
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
 }
